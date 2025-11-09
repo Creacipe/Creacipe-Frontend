@@ -76,13 +76,16 @@
 
 /* --- TAMBAHKAN STYLE UNTUK SUB-MENU --- */
 
-.sub-menu-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.dropdown-item-wrapper {
+  .sub-menu-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  span {
-    font-size: 0.7rem;
+    .arrow {
+      font-size: 0.7rem;
+      margin-left: auto;
+    }
   }
 }
 
@@ -108,5 +111,38 @@
 
   &:hover {
     background-color: #fce8e6;
+  }
+}
+
+/* === RESPONSIVE MOBILE === */
+@media (max-width: 768px) {
+  .profile-dropdown-container {
+    width: 100%;
+  }
+
+  /* Hide toggle button on mobile */
+  .dropdown-toggle {
+    display: none;
+  }
+
+  .dropdown-menu {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    border-top: 1px solid #eee;
+    margin-top: 0.5rem;
+  }
+
+  .dropdown-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .sub-dropdown-menu {
+    padding-left: 2rem;
   }
 }

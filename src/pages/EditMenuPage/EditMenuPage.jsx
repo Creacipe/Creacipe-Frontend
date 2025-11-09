@@ -1,92 +1,161 @@
-// LOKASI: src/pages/CreateMenuPage/CreateMenuPage.jsx (VERSI DIPERBARUI)
+// LOKASI: src/pages/EditMenuPage/EditMenuPage.jsx
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { menuService } from "../../services/menuService";
-import "./CreateMenuPage.scss";
 import { tagService } from "../../services/tagService";
+import "./EditMenuPage.scss";
 
-const CreateMenuPage = () => {
+const EditMenuPage = () => {
+  const { id } = useParams(); // Ambil ID dari URL
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState(null); // State untuk file
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null); // State untuk file baru
+  const [imagePreview, setImagePreview] = useState(null); // State untuk preview
+  const [currentImageUrl, setCurrentImageUrl] = useState(""); // Gambar yang ada sekarang
   const [ingredients, setIngredients] = useState([""]);
   const [instructions, setInstructions] = useState([""]);
 
-  // --- STATE BARU UNTUK TAGS ---
-  const [allTags, setAllTags] = useState([]); // Menampung semua tag dari DB
-  const [selectedTags, setSelectedTags] = useState([]); // Menampung ID tag yang dipilih [1, 5, 8]
-  // ------------------------------
+  // State untuk tags
+  const [allTags, setAllTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const navigate = useNavigate();
 
-  // --- 2. useEffect UNTUK MENGAMBIL SEMUA TAG SAAT HALAMAN DIMUAT ---
+  // Fetch data menu yang akan diedit
   useEffect(() => {
-    const fetchTags = async () => {
+    const fetchMenuData = async () => {
       try {
-        const response = await tagService.getAllTags();
-        // Backend mengirim { data: [...] }, dan GORM mengirim 'TagID' dan 'TagName'
-        setAllTags(response.data.data);
+        setLoading(true);
+
+        // Fetch menu detail
+        const menuResponse = await menuService.getMenuById(id);
+        const menuData = menuResponse.data.data;
+
+        // Set data ke state
+        setTitle(menuData.title || "");
+        setDescription(menuData.description || "");
+        setCurrentImageUrl(menuData.image_url || "");
+
+        // Parse ingredients dan instructions dari JSON
+        let ingredientsArray = [""];
+        let instructionsArray = [""];
+
+        try {
+          if (menuData.ingredients) {
+            // Cek apakah sudah berupa array atau masih string JSON
+            ingredientsArray =
+              typeof menuData.ingredients === "string"
+                ? JSON.parse(menuData.ingredients)
+                : menuData.ingredients;
+          }
+        } catch (err) {
+          console.error("Error parsing ingredients:", err);
+          ingredientsArray = [""];
+        }
+
+        try {
+          if (menuData.instructions) {
+            // Cek apakah sudah berupa array atau masih string JSON
+            instructionsArray =
+              typeof menuData.instructions === "string"
+                ? JSON.parse(menuData.instructions)
+                : menuData.instructions;
+          }
+        } catch (err) {
+          console.error("Error parsing instructions:", err);
+          instructionsArray = [""];
+        }
+
+        setIngredients(ingredientsArray.length > 0 ? ingredientsArray : [""]);
+        setInstructions(
+          instructionsArray.length > 0 ? instructionsArray : [""]
+        );
+
+        // Fetch all tags terlebih dahulu
+        const tagsResponse = await tagService.getAllTags();
+        const allTagsData = tagsResponse.data.data || [];
+        setAllTags(allTagsData);
+
+        // Set selected tags (ambil dari menu.tags - lowercase karena backend kirim snake_case)
+        if (menuData.tags && Array.isArray(menuData.tags)) {
+          // Convert to numbers untuk konsistensi - gunakan tag_id (snake_case)
+          const tagIds = menuData.tags.map((tag) => Number(tag.tag_id));
+          setSelectedTags(tagIds);
+        }
+
+        setLoading(false);
       } catch (err) {
-        console.error("Gagal mengambil tags:", err);
-        // Biarkan 'allTags' kosong jika gagal
+        console.error("Error fetching menu data:", err);
+        setError("Gagal memuat data resep. Silakan coba lagi.");
+        setLoading(false);
       }
     };
 
-    fetchTags();
-  }, []); // [] = Jalankan sekali saat halaman dimuat
-  // -------------------------------------------------------------
+    fetchMenuData();
+  }, [id]);
 
-  // --- (Semua fungsi handler untuk Bahan & Instruksi tetap sama) ---
+  // Handler untuk ingredients
   const handleIngredientChange = (index, value) => {
     const newIngredients = [...ingredients];
     newIngredients[index] = value;
     setIngredients(newIngredients);
   };
+
   const handleAddIngredient = () => {
     setIngredients([...ingredients, ""]);
   };
+
   const handleRemoveIngredient = (index) => {
     const newIngredients = [...ingredients];
     newIngredients.splice(index, 1);
     setIngredients(newIngredients);
   };
+
+  // Handler untuk instructions
   const handleInstructionChange = (index, value) => {
     const newInstructions = [...instructions];
     newInstructions[index] = value;
     setInstructions(newInstructions);
   };
+
   const handleAddInstruction = () => {
     setInstructions([...instructions, ""]);
   };
+
   const handleRemoveInstruction = (index) => {
     const newInstructions = [...instructions];
     newInstructions.splice(index, 1);
     setInstructions(newInstructions);
   };
 
-  // --- 3. HANDLER BARU UNTUK CHECKBOX TAG ---
+  // Handler untuk tag checkbox
   const handleTagChange = (tagId) => {
     setSelectedTags((prevSelectedTags) => {
-      if (prevSelectedTags.includes(tagId)) {
-        // Jika ID sudah ada, hapus (uncheck)
-        return prevSelectedTags.filter((id) => id !== tagId);
+      // Ensure consistent comparison using numbers
+      const numericTagId = Number(tagId);
+      const isAlreadySelected = prevSelectedTags.some(
+        (id) => Number(id) === numericTagId
+      );
+
+      if (isAlreadySelected) {
+        return prevSelectedTags.filter((id) => Number(id) !== numericTagId);
       } else {
-        // Jika ID belum ada, tambahkan (check)
-        return [...prevSelectedTags, tagId];
+        return [...prevSelectedTags, numericTagId];
       }
     });
   };
-  // ------------------------------------------
-  // --- 4. HANDLER UNTUK UPLOAD GAMBAR + PREVIEW ---
+
+  // Handler untuk upload gambar
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      
+
       // Buat preview URL dari file
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -96,7 +165,7 @@ const CreateMenuPage = () => {
     }
   };
 
-  // Cleanup preview URL saat component unmount
+  // Cleanup preview URL
   useEffect(() => {
     return () => {
       if (imagePreview) {
@@ -104,60 +173,68 @@ const CreateMenuPage = () => {
       }
     };
   }, [imagePreview]);
-  // 
 
-  // --- INI ADALAH FUNGSI YANG BERUBAH TOTAL ---
+  // Handler submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    // 1. Filter input yang kosong
+    // Filter input yang kosong
     const filteredIngredients = ingredients.filter((i) => i.trim() !== "");
     const filteredInstructions = instructions.filter((i) => i.trim() !== "");
 
-    // 2. Ubah array kita menjadi JSON string (backend tetap menerima ini)
+    // Ubah array menjadi JSON string
     const ingredientsJSON = JSON.stringify(filteredIngredients);
     const instructionsJSON = JSON.stringify(filteredInstructions);
 
-    // 3. Buat FormData
+    // Buat FormData
     const formData = new FormData();
-
-    // 4. Tambahkan semua data teks
     formData.append("title", title);
     formData.append("description", description);
     formData.append("ingredients", ingredientsJSON);
     formData.append("instructions", instructionsJSON);
 
-    // --- 4. PERBARUI LOGIKA TAG_IDS ---
-    // Ubah array [1, 5, 8] menjadi string "1,5,8"
+    // Tag IDs
     const tagIdsString = selectedTags.join(",");
     formData.append("tag_ids", tagIdsString);
-    // ---------------------------------
 
-    // 5. Validasi dan tambahkan gambar (WAJIB)
-    if (!imageFile) {
-      setError("Gambar wajib diupload!");
-      return;
+    // Tambahkan gambar jika ada yang baru diupload
+    if (imageFile) {
+      formData.append("image_file", imageFile);
     }
-    formData.append("image_file", imageFile);
 
     try {
-      // 7. Kirim FormData ke service
-      await menuService.createMenu(formData);
-      setSuccess("Resep berhasil dibuat! Menunggu persetujuan editor.");
-      setTimeout(() => navigate("/"), 2000);
+      await menuService.updateMenu(id, formData);
+      setSuccess("Resep berhasil diperbarui!");
+      setTimeout(() => navigate("/collection/my-recipes"), 2000);
     } catch (err) {
-      const errorMessage = err.response?.data?.error || "Gagal membuat resep.";
+      const errorMessage =
+        err.response?.data?.error || "Gagal memperbarui resep.";
       setError(errorMessage);
     }
   };
-  // -----------------------------------------------------------------
+
+  if (loading) {
+    return (
+      <div className="form-page-container edit-menu-container">
+        <p>Memuat data resep...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="form-page-container create-menu-container">
-      <h2>Buat Resep Baru</h2>
-      <p>Bagikan kreasimu kepada dunia!</p>
+    <div className="form-page-container edit-menu-container">
+      {/* Tombol Back */}
+      <button
+        type="button"
+        className="back-button"
+        onClick={() => navigate("/collection/my-recipes")}>
+        &lt;
+      </button>
+
+      <h2>Edit Resep</h2>
+      <p>Perbarui resep Anda</p>
 
       <form onSubmit={handleSubmit}>
         <div>
@@ -182,7 +259,7 @@ const CreateMenuPage = () => {
             onChange={(e) => setDescription(e.target.value)}></textarea>
         </div>
 
-        {/* ... (Form Dinamis Bahan & Instruksi tetap sama) ... */}
+        {/* Bahan-bahan */}
         <div style={{ marginTop: "1rem" }}>
           <label>Bahan-bahan</label>
           {ingredients.map((ingredient, index) => (
@@ -209,6 +286,7 @@ const CreateMenuPage = () => {
           </button>
         </div>
 
+        {/* Langkah-langkah */}
         <div style={{ marginTop: "1rem" }}>
           <label>Langkah-langkah</label>
           {instructions.map((step, index) => (
@@ -234,69 +312,75 @@ const CreateMenuPage = () => {
             + Langkah
           </button>
         </div>
-        {/* ------------------------------------------------------- */}
 
-        {/* --- UPLOAD GAMBAR (WAJIB) --- */}
+        {/* Upload Gambar */}
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="imageFile">
-            Upload Gambar <span style={{ color: "red" }}>*</span>
-          </label>
+          <label htmlFor="imageFile">Upload Gambar Baru (Opsional)</label>
           <input
             type="file"
             id="imageFile"
             accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
             onChange={handleImageChange}
-            required
           />
           {imageFile && <small>File dipilih: {imageFile.name}</small>}
 
-          {/* Preview Gambar */}
+          {/* Preview Gambar Baru */}
           {imagePreview && (
             <div className="image-preview-container">
-              <img 
-                src={imagePreview} 
-                alt="Preview Gambar" 
-              />
+              <p>Preview Gambar Baru:</p>
+              <img src={imagePreview} alt="Preview Gambar Baru" />
+            </div>
+          )}
+
+          {/* Tampilkan Gambar Lama jika tidak ada gambar baru */}
+          {!imagePreview && currentImageUrl && (
+            <div className="image-preview-container">
+              <p>Gambar Saat Ini:</p>
+              <img src={currentImageUrl} alt="Gambar Saat Ini" />
             </div>
           )}
         </div>
-        {/* ----------------------------------- */}
 
-        {/* --- 5. RENDER CHECKBOX TAGS --- */}
+        {/* Tag Checkbox */}
         <div style={{ marginTop: "1rem" }}>
           <label>Pilih Tag (Opsional)</label>
           <div className="tag-checkbox-container">
             {allTags.length > 0 ? (
-              allTags.map((tag) => (
-                <div key={tag.TagID} className="tag-checkbox-item">
-                  <input
-                    type="checkbox"
-                    id={`tag-${tag.TagID}`}
-                    value={tag.TagID}
-                    // Cek apakah 'tag.TagID' ada di dalam array 'selectedTags'
-                    checked={selectedTags.includes(tag.TagID)}
-                    onChange={() => handleTagChange(tag.TagID)}
-                  />
-                  {/* Kita tampilkan 'TagName' dari data API */}
-                  <label htmlFor={`tag-${tag.TagID}`}>{tag.TagName}</label>
-                </div>
-              ))
+              allTags.map((tag) => {
+                // Convert both to number for comparison - gunakan tag_id (snake_case)
+                const tagId = Number(tag.tag_id);
+                const isChecked = selectedTags.some(
+                  (selectedId) => Number(selectedId) === tagId
+                );
+
+                return (
+                  <div key={tag.tag_id} className="tag-checkbox-item">
+                    <input
+                      type="checkbox"
+                      id={`tag-${tag.tag_id}`}
+                      value={tag.tag_id}
+                      checked={isChecked}
+                      onChange={() => handleTagChange(tag.tag_id)}
+                    />
+                    <label htmlFor={`tag-${tag.tag_id}`}>{tag.tag_name}</label>
+                  </div>
+                );
+              })
             ) : (
               <small>Loading tags...</small>
             )}
           </div>
         </div>
-        {/* ------------------------------- */}
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
         {success && (
           <p style={{ color: "green", textAlign: "center" }}>{success}</p>
         )}
 
-        <button type="submit">Kirim Resep</button>
+        <button type="submit">Perbarui Resep</button>
       </form>
     </div>
   );
 };
 
-export default CreateMenuPage;
+export default EditMenuPage;

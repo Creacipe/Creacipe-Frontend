@@ -8,19 +8,34 @@ import "./Profile.scss";
 const Profile = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [isCollectionOpen, setIsCollectionOpen] = useState(false); // State baru
+  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const dropdownRef = useRef(null);
+
+  // Detect screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
-        setIsCollectionOpen(false); // Tutup sub-menu juga
+        setIsCollectionOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+
+    // Only add click outside listener on desktop
+    if (!isMobile) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isMobile]);
 
   const closeMenu = () => {
     setIsOpen(false);
@@ -33,14 +48,21 @@ const Profile = () => {
   const displayName = user.Name || user.name || "User";
   const displayEmail = user.Email || user.email || "";
 
+  // Di mobile, menu selalu terbuka (tidak pakai dropdown)
+  const showMenu = isMobile ? true : isOpen;
+
   return (
     <div className="profile-dropdown-container" ref={dropdownRef}>
-      <button onClick={() => setIsOpen(!isOpen)} className="dropdown-toggle">
-        {displayName}
-        <span>▼</span>
-      </button>
+      {/* Toggle button hanya muncul di desktop */}
+      {!isMobile && (
+        <button onClick={() => setIsOpen(!isOpen)} className="dropdown-toggle">
+          {displayName}
+          <span>▼</span>
+        </button>
+      )}
 
-      {isOpen && (
+      {/* Di mobile, langsung tampilkan menu tanpa toggle */}
+      {showMenu && (
         <div className="dropdown-menu">
           <div className="dropdown-header">
             <strong>{displayName}</strong>
@@ -55,37 +77,38 @@ const Profile = () => {
             Buat Resep
           </Link>
 
-          {/* --- SUB-MENU BARU --- */}
-          <div
-            className="dropdown-item sub-menu-toggle"
-            onClick={() => setIsCollectionOpen(!isCollectionOpen)}>
-            Koleksi Resep
-            <span>{isCollectionOpen ? "▲" : "▼"}</span>
-          </div>
-
-          {isCollectionOpen && (
-            <div className="sub-dropdown-menu">
-              <Link
-                to="/koleksi/semua"
-                className="dropdown-item sub-item"
-                onClick={closeMenu}>
-                Semua Resep
-              </Link>
-              <Link
-                to="/koleksi/resep-mu"
-                className="dropdown-item sub-item"
-                onClick={closeMenu}>
-                Resep Mu
-              </Link>
-              <Link
-                to="/koleksi/tersimpan"
-                className="dropdown-item sub-item"
-                onClick={closeMenu}>
-                Tersimpan
-              </Link>
+          {/* Sub-menu Koleksi Resep */}
+          <div className="dropdown-item-wrapper">
+            <div
+              className="dropdown-item sub-menu-toggle"
+              onClick={() => setIsCollectionOpen(!isCollectionOpen)}>
+              Koleksi Resep
+              <span className="arrow">{isCollectionOpen ? "▲" : "▼"}</span>
             </div>
-          )}
-          {/* -------------------- */}
+
+            {isCollectionOpen && (
+              <div className="sub-dropdown-menu">
+                <Link
+                  to="/collection/all"
+                  className="dropdown-item sub-item"
+                  onClick={closeMenu}>
+                  Semua Resep
+                </Link>
+                <Link
+                  to="/collection/my-recipes"
+                  className="dropdown-item sub-item"
+                  onClick={closeMenu}>
+                  Resepmu
+                </Link>
+                <Link
+                  to="/collection/saved"
+                  className="dropdown-item sub-item"
+                  onClick={closeMenu}>
+                  Tersimpan
+                </Link>
+              </div>
+            )}
+          </div>
 
           <button
             onClick={logout}

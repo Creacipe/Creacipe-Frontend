@@ -47,7 +47,7 @@ const HomePage = () => {
     return (
       <div className="recipe-grid">
         {popularMenus.map((menu) => (
-          <RecipeCard key={menu.menu_id} menu={menu} />
+          <RecipeCard key={menu.menu_id} menu={menu} showStatus={false} sourceFrom="home" />
         ))}
       </div>
     );

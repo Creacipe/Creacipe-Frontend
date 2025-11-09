@@ -42,6 +42,38 @@ const unbookmarkMenu = (id) => {
   return api.delete(`/menus/${id}/bookmark`);
 };
 
+/**
+ * Mendapatkan status interaksi user (like/dislike/bookmark) untuk sebuah menu.
+ * Endpoint: GET /api/menus/:id/interaction-status
+ */
+const getUserInteractionStatus = (id) => {
+  return api.get(`/menus/${id}/interaction-status`);
+};
+
+/**
+ * Mendapatkan semua resep yang dibuat oleh user yang sedang login.
+ * Endpoint: GET /api/me/menus
+ */
+const getMyMenus = () => {
+  return api.get("/me/menus");
+};
+
+/**
+ * Mendapatkan semua resep yang di-bookmark oleh user.
+ * Endpoint: GET /api/me/bookmarks
+ */
+const getMyBookmarks = () => {
+  return api.get("/me/bookmarks");
+};
+
+/**
+ * Mendapatkan gabungan resep milik user dan bookmark.
+ * Endpoint: GET /api/me/collection
+ */
+const getMyCollection = () => {
+  return api.get("/me/collection");
+};
+
 // --- GANTI FUNGSI INI ---
 /**
  * Mengirim resep baru ke backend.
@@ -52,6 +84,25 @@ const createMenu = (formData) => {
   // Axios akan otomatis mengatur Content-Type: multipart/form-data
   // saat kita mengirim FormData
   return api.post('/menus', formData);
+};
+
+/**
+ * Mengupdate resep yang sudah ada.
+ * Endpoint: PUT /api/menus/:id
+ * @param {number} id - ID resep
+ * @param {FormData} formData - Data resep yang diupdate
+ */
+const updateMenu = (id, formData) => {
+  return api.put(`/menus/${id}`, formData);
+};
+
+/**
+ * Menghapus resep.
+ * Endpoint: DELETE /api/menus/:id
+ * @param {number} id - ID resep yang akan dihapus
+ */
+const deleteMenu = (id) => {
+  return api.delete(`/menus/${id}`);
 };
 // ---------------------------------
 // --- PERBARUI EKSPOR DI BAGIAN BAWAH ---
@@ -65,4 +116,10 @@ export const menuService = {
   bookmarkMenu,   // Tambahkan
   unbookmarkMenu, // Tambahkan
   createMenu,     // Tambahkan
+  getUserInteractionStatus, // Tambahkan
+  getMyMenus,            // Tambahkan
+  getMyBookmarks,        // Tambahkan
+  getMyCollection,      // Tambahkan
+  updateMenu,      // Tambahkan
+  deleteMenu,       // Tambahkan
 };

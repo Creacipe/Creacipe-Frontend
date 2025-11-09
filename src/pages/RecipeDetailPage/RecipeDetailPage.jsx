@@ -1,7 +1,7 @@
 // LOKASI: src/pages/RecipeDetailPage/RecipeDetailPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { menuService } from '../../services/menuService';
 import RecipeCard from '../../components/recipe/RecipeCard/RecipeCard';
 import { useAuth } from '../../context/AuthContext'; // Impor useAuth
@@ -27,10 +27,16 @@ const RecipeDetailPage = () => {
   const { id } = useParams(); // Mengambil 'id' dari URL
   const menuId = parseInt(id, 10); // Ubah ID jadi angka untuk perbandingan
   const navigate = useNavigate(); // Hook untuk tombol "Kembali"
+  const location = useLocation();
   const [menu, setMenu] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isOwnRecipe, setIsOwnRecipe] = useState(false);
+
+   // Cek apakah datang dari homepage/beranda
+  // Hanya tampilkan rekomendasi jika datang dari home
+  const showRecommendations = location.state?.from === "home";
 
   // Ambil status login DAN data user lengkap
   const { isLoggedIn, user } = useAuth();
@@ -51,8 +57,23 @@ const RecipeDetailPage = () => {
         const response = await menuService.getMenuById(id);
         const menuData = response.data.data; // Ini PascalCase
 
-        menuData.parsedIngredients = safeParseJSON(menuData.Ingredients);
-        menuData.parsedInstructions = safeParseJSON(menuData.Instructions);
+
+        // Cek apakah resep sudah approved atau milik user sendiri
+        const isOwner = user && menuData.user_id === user.user_id;
+        const isApproved = menuData.status === "approved";
+
+        // Set state untuk track ownership
+        setIsOwnRecipe(isOwner);
+        
+        // Jika bukan pemilik dan belum approved, redirect atau error
+        if (!isOwner && !isApproved) {
+          setError('Resep belum disetujui dan tidak dapat ditampilkan.');
+          setLoading(false);
+          return;
+        }
+
+        menuData.parsedIngredients = safeParseJSON(menuData.ingredients);
+        menuData.parsedInstructions = safeParseJSON(menuData.instructions);
 
         setMenu(menuData);
       } catch (err) {
@@ -64,10 +85,14 @@ const RecipeDetailPage = () => {
     };
 
     fetchMenuDetail();
-  }, [id]); // Jalan lagi jika ID di URL berubah
+  }, [id, user]); // Jalan lagi jika ID di URL berubah
 
   // Efek untuk mengambil REKOMENDASI RESEP
   useEffect(() => {
+    if (!showRecommendations) {
+      return; // Lewati jika tidak perlu rekomendasi
+    }
+
     const fetchRecommendations = async () => {
       try {
         const response = await menuService.getRecommendations(id);
@@ -79,7 +104,7 @@ const RecipeDetailPage = () => {
     };
     
     fetchRecommendations();
-  }, [id]); // Jalan lagi jika ID resep berubah
+  }, [id, showRecommendations]); // Jalan lagi jika ID resep berubah
 
   // --- EFEK BARU: Mengatur status tombol saat user atau menu dimuat ---
   useEffect(() => {
@@ -154,12 +179,12 @@ const RecipeDetailPage = () => {
       </button>
 
       {/* Judul Resep */}
-      <h2 className="recipe-title">{menu.Title}</h2> 
+      <h2 className="recipe-title">{menu.title}</h2> 
       
-      {/* Link Penulis Resep */}
-      {menu.User && (
-        <Link to={`/user/${menu.User.UserID}`} className="recipe-author">
-          Oleh: {menu.User.Name}
+      {/* Link Penulis Resep*/}
+      {menu.user && (
+        <Link to={`/user/${menu.user.user_id}`} className="recipe-author">
+          Oleh: {menu.user.name}
         </Link>
       )}
 
@@ -189,11 +214,19 @@ const RecipeDetailPage = () => {
 
       {/* Gambar Resep */}
       <div className="recipe-detail-image">
-        <img src={menu.ImageURL || 'https://via.placeholder.com/600x400?text=Resep'} alt={menu.Title} />
+        <img
+          src={menu.image_url || "https://via.placeholder.com/600x400?text=Resep"}
+          alt={menu.title}
+          onError={(e) => {
+            console.error("Error loading image:", menu.image_url);
+            e.target.src =
+              "https://via.placeholder.com/600x400?text=Image+Not+Found";
+          }}
+        />
       </div>
 
       {/* Deskripsi */}
-      <p className="recipe-detail-description">{menu.Description}</p>
+      <p className="recipe-detail-description">{menu.description}</p>
 
       {/* Layout 2 Kolom */}
       <div className="detail-layout-grid">
@@ -217,22 +250,30 @@ const RecipeDetailPage = () => {
         </div>
       </div>
 
-      {/* BAGIAN KOMENTAR (Statis, dihiraukan) */}
-      <div className="comment-section">
-        <h3>Komentar</h3>
-        <form className="comment-form">
-          <input type="text" placeholder="Fitur komentar belum tersedia" readOnly/>
-          <button type="submit" disabled>Kirim</button>
-        </form>
-      </div>
+      {/* BAGIAN KOMENTAR - Hide jika resep milik user sendiri */}
+      {!isOwnRecipe && (
+        <div className="comment-section">
+          <h3>Komentar</h3>
+          <form className="comment-form">
+            <input
+              type="text"
+              placeholder="Fitur komentar belum tersedia"
+              readOnly
+            />
+            <button type="submit" disabled>
+              Kirim
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* BAGIAN REKOMENDASI */}
-      {recommendations.length > 0 && (
+      {showRecommendations &&recommendations.length > 0 && (
         <div className="recommendation-section">
           <h3>Resep Serupa</h3>
           <div className="recipe-grid">
-            {recommendations.map((recMenu) => (
-              <RecipeCard key={recMenu.MenuID} menu={recMenu} /> 
+            {recommendations.map((recMenu, index) => (
+              <RecipeCard key={`rec-${recMenu.menu_id || index}`} menu={recMenu} /> 
             ))}
           </div>
         </div>
