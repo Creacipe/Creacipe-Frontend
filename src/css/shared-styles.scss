@@ -1,0 +1,45 @@
+/* LOKASI: src/css/shared-styles.scss */
+
+/* Style global untuk form agar rapi */
+.form-page-container {
+  max-width: 450px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-page-container h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+/* Style global untuk input dan button */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Penting agar padding tidak merusak lebar */
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
+}

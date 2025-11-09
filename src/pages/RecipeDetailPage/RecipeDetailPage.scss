@@ -1,0 +1,223 @@
+/* LOKASI: src/pages/RecipeDetailPage/RecipeDetailPage.scss (VERSI BARU) */
+
+.recipe-detail-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  // background-color: #ffffff;
+  // border-radius: 8px;
+  // box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- TAMBAHKAN STYLE INI --- */
+.back-button {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50%; /* Membuatnya bulat */
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+/* --------------------------- */
+
+.recipe-title {
+  text-align: center;
+  margin-top: 0;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-author {
+  display: block;
+  text-align: center;
+  color: #007bff;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* --- TAMBAHKAN STYLE INI --- */
+.action-buttons-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  
+  .action-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+}
+/* --------------------------- */
+
+.recipe-detail-image {
+  width: 100%;
+  margin-bottom: 2rem;
+  img {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+}
+
+.recipe-detail-description {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* --- STYLE UNTUK 2 KOLOM --- */
+.detail-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Default 1 kolom di HP */
+  gap: 2rem;
+  margin-bottom: 2rem;
+
+  /* Ubah jadi 2 kolom di layar lebih besar (laptop/tablet) */
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 2fr; /* Kolom bahan lebih kecil */
+  }
+}
+
+.ingredients-section, .instructions-section {
+  h3 {
+    font-size: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  ul, ol {
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+}
+
+/* --- STYLE UNTUK KOMENTAR --- */
+.comment-section {
+  margin-bottom: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 2rem;
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  
+  input[type="text"] {
+    flex: 1; /* Ambil sisa ruang */
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  button[type="submit"] {
+    padding: 0.75rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}
+
+/* --- STYLE UNTUK REKOMENDASI --- */
+.recommendation-section {
+  border-top: 1px solid #eee;
+  padding-top: 2rem;
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Kita gunakan ulang style grid dari HomePage */
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.action-buttons-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  
+  .action-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #555; // Warna default (belum aktif)
+    
+    &:hover {
+      background-color: #e0e0e0;
+    }
+
+    /* --- TAMBAHKAN STYLE INI --- */
+    /* Style saat tombol 'Like' aktif */
+    &.active-like {
+      background-color: #e6f7ff;
+      border-color: #007bff;
+      color: #007bff;
+    }
+    
+    /* Style saat tombol 'Dislike' aktif */
+    &.active-dislike {
+      background-color: #fce8e6;
+      border-color: #d93025;
+      color: #d93025;
+    }
+
+    /* Style saat tombol 'Bookmark' aktif (seperti ikon terisi) */
+    &.active-bookmark {
+      background-color: #fffbe6;
+      border-color: #ffc107;
+      color: #e6a800;
+    }
+    /* --------------------------- */
+  }
+}

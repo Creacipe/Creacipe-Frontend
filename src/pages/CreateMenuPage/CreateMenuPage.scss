@@ -1,0 +1,111 @@
+/* LOKASI: src/pages/CreateMenuPage/CreateMenuPage.scss */
+
+.create-menu-container {
+  max-width: 700px; /* Lebih lebar dari form login */
+
+  p {
+    text-align: center;
+    color: #555;
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
+
+/* --- STYLE BARU UNTUK FORM DINAMIS --- */
+.dynamic-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  input[type="text"] {
+    flex: 1; /* Input mengambil sisa ruang */
+    margin-top: 0;
+  }
+}
+
+.remove-btn, .add-btn {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+.remove-btn {
+  background-color: #fce8e6;
+  border-color: #d93025;
+  color: #d93025;
+}
+
+.add-btn {
+  background-color: #e6f7ff;
+  border-color: #007bff;
+  color: #007bff;
+  padding: 0.5rem 1rem;
+}
+
+/* --- STYLE BARU UNTUK TAG CHECKBOX --- */
+.tag-checkbox-container {
+  display: flex;
+  flex-wrap: wrap; // Biar rapi jika tag-nya banyak
+  gap: 0.5rem;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  margin-top: 0.5rem;
+  max-height: 200px; // Beri batas tinggi
+  overflow-y: auto; // Beri scroll jika terlalu banyak
+}
+
+.tag-checkbox-item {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 20px; // Membuatnya seperti "pill"
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+
+  label {
+    margin-top: 0; // Override style label global dari form
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  /* Style keren saat di-hover atau di-check */
+  &:hover {
+    background-color: #f0f0f0;
+  }
+
+  &:has(input:checked) {
+    background-color: #e6f7ff;
+    border-color: #007bff;
+    color: #0056b3;
+    font-weight: 500;
+  }
+}
+/* -------------------------------------- */

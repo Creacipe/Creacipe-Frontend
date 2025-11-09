@@ -1,0 +1,43 @@
+/* LOKASI: src/components/recipe/RecipeCard/RecipeCard.scss */
+
+.recipe-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Memastikan gambar tidak keluar dari border-radius */
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .recipe-card-image img {
+    width: 100%;
+    height: 180px; /* Tinggi gambar yang konsisten */
+    object-fit: cover; /* Memastikan gambar mengisi area tanpa distorsi */
+    display: block;
+  }
+
+  .recipe-card-content {
+    padding: 1rem;
+  }
+
+  .recipe-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    /* Memotong teks jika terlalu panjang */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .recipe-card-info {
+    font-size: 0.9rem;
+    color: #777;
+    margin: 0;
+  }
+}

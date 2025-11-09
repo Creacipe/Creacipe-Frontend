@@ -1,0 +1,112 @@
+/* LOKASI: src/components/ui/Profile/Profile.scss */
+
+.profile-dropdown-container {
+  position: relative; // Penting untuk posisi menu
+  z-index: 10;
+}
+
+.dropdown-toggle {
+  background-color: #007bff;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  span {
+    font-size: 0.7rem;
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 120%; // Muncul di bawah tombol
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  overflow: hidden; // Agar border-radius-nya rapi
+}
+
+.dropdown-header {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    font-size: 1rem;
+  }
+  small {
+    font-size: 0.8rem;
+    color: #777;
+  }
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  color: #333;
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f4f6f8;
+  }
+}
+
+.dropdown-item-logout {
+  border-top: 1px solid #eee;
+  color: #d93025;
+  font-weight: 600;
+
+  &:hover {
+    background-color: #fce8e6;
+  }
+}
+
+/* --- TAMBAHKAN STYLE UNTUK SUB-MENU --- */
+
+.sub-menu-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  span {
+    font-size: 0.7rem;
+  }
+}
+
+.sub-dropdown-menu {
+  background-color: #f8f9fa; // Warna sedikit beda
+  padding-left: 1rem; // Indentasi
+}
+
+.sub-item {
+  font-size: 0.9rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+
+  &:hover {
+    background-color: #e9ecef;
+  }
+}
+
+.dropdown-item-logout {
+  border-top: 1px solid #eee;
+  color: #d93025;
+  font-weight: 600;
+
+  &:hover {
+    background-color: #fce8e6;
+  }
+}
