@@ -1,48 +1,89 @@
-// LOKASI: src/routes/AppRouter.jsx (VERSI DIPERBARUI)
+// LOKASI: src/routes/AppRouter.jsx
 
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-import LoginPage from '../pages/LoginPage/LoginPage'; 
-import RegisterPage from '../pages/RegisterPage/RegisterPage';
-import HomePage from '../pages/HomePage/HomePage'; 
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import RecipeDetailPage from '../pages/RecipeDetailPage/RecipeDetailPage';
+// Layouts
+import MainLayout from "../layouts/MainLayout";
+import DashboardLayout from "../layouts/DashboardLayout";
+
+// Public Pages
+import LoginPage from "../pages/LoginPage/LoginPage";
+import RegisterPage from "../pages/RegisterPage/RegisterPage";
+import HomePage from "../pages/HomePage/HomePage";
+import RecipeDetailPage from "../pages/RecipeDetailPage/RecipeDetailPage";
+
+// User Pages
+import CreateMenuPage from "../pages/CreateMenuPage/CreateMenuPage";
+import EditMenuPage from "../pages/EditMenuPage/EditMenuPage";
 import AllRecipesPage from "../pages/AllRecipesPage/AllRecipesPage";
 import MyRecipesPage from "../pages/MyRecipesPage/MyRecipesPage";
 import SavedRecipesPage from "../pages/SavedRecipesPage/SavedRecipesPage";
-import EditMenuPage from '../pages/EditMenuPage/EditMenuPage';
+import ProfilePage from "../pages/ProfilePage/ProfilePage";
+
+// Dashboard Pages (Editor & Admin)
+import {
+  DashboardHomePage,
+  AllRecipesPage as DashboardAllRecipes,
+  PendingRecipesPage,
+  TagManagementPage,
+  CategoryManagementPage,
+  UserManagementPage,
+  ActivityLogsPage,
+} from "../pages/Dashboard";
 
 // Routes
-import ProtectedRoute from './ProtectedRoute';
-import CreateMenuPage from '../pages/CreateMenuPage/CreateMenuPage';
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rute Utama (Publik) */}
+        {/* Public Routes */}
         <Route element={<MainLayout />}>
-          {/* 2. Ganti elemen 'div' dengan komponen HomePage kita */}
-          <Route path="/" element={<HomePage />} /> 
-          
-          <Route path="/login" element={<LoginPage />} /> 
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/menu/:id" element={<RecipeDetailPage />} />
-          {/* --- RUTE BARU YANG TERPROTEKSI --- */}
-          {/* Ini akan dibungkus MainLayout DAN ProtectedRoute.
-            Jika tidak login, akan dilempar ke /login.
-            Jika login, akan menampilkan CreateMenuPage.
-          */}
+
+          {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/menu/create" element={<CreateMenuPage />} />
             <Route path="/menu/edit/:id" element={<EditMenuPage />} />
             <Route path="/collection/all" element={<AllRecipesPage />} />
             <Route path="/collection/my-recipes" element={<MyRecipesPage />} />
             <Route path="/collection/saved" element={<SavedRecipesPage />} />
-            {/* Nanti kita tambahkan rute /profile di sini juga */}
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
-          {/* ----------------------------------- */}
+        </Route>
+
+        {/* Dashboard Routes (Editor & Admin) */}
+        <Route element={<ProtectedRoute allowedRoles={["admin", "editor"]} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardHomePage />} />
+            <Route path="/dashboard/profile" element={<ProfilePage />} />
+            <Route
+              path="/dashboard/recipes"
+              element={<DashboardAllRecipes />}
+            />
+            <Route
+              path="/dashboard/recipes/pending"
+              element={<PendingRecipesPage />}
+            />
+            <Route path="/dashboard/tags" element={<TagManagementPage />} />
+            <Route
+              path="/dashboard/categories"
+              element={<CategoryManagementPage />}
+            />
+          </Route>
+        </Route>
+
+        {/* Admin Only Routes */}
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard/users" element={<UserManagementPage />} />
+            <Route path="/dashboard/logs" element={<ActivityLogsPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

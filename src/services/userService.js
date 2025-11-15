@@ -9,7 +9,14 @@ import api from './api';
 const getMyProfile = () => {
   return api.get('/me');
 };
-
+/**
+ * Memperbarui profil pengguna yang sedang login.
+ * Endpoint: PUT /api/me
+ */
+const updateMyProfile = (data) => {
+  return api.put("/me", data);
+};
 export const userService = {
   getMyProfile,
+  updateMyProfile,
 };

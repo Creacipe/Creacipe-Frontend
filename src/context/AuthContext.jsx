@@ -75,7 +75,8 @@ export const AuthProvider = ({ children }) => {
 
   // 7. Nilai yang akan dibagikan ke seluruh aplikasi
   const value = {
-    user, // Data user (atau null)
+    user,
+    setUser, // Data user (atau null)
     isLoggedIn: !!user, // boolean (true jika user ada, false jika null)
     loading, // Status loading (berguna untuk loading awal)
     login, // Fungsi login

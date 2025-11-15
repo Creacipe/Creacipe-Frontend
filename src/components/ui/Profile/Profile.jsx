@@ -48,6 +48,10 @@ const Profile = () => {
   const displayName = user.Name || user.name || "User";
   const displayEmail = user.Email || user.email || "";
 
+  // Cek apakah user adalah admin atau editor
+  const userRole = user.role || user.Role?.role_name;
+  const isAdminOrEditor = userRole === "admin" || userRole === "editor";
+
   // Di mobile, menu selalu terbuka (tidak pakai dropdown)
   const showMenu = isMobile ? true : isOpen;
 
@@ -72,6 +76,13 @@ const Profile = () => {
           <Link to="/profile" className="dropdown-item" onClick={closeMenu}>
             Profil Saya
           </Link>
+
+          {/* Menu Dashboard - hanya untuk Admin/Editor */}
+          {isAdminOrEditor && (
+            <Link to="/dashboard" className="dropdown-item" onClick={closeMenu}>
+              Dashboard
+            </Link>
+          )}
 
           <Link to="/menu/create" className="dropdown-item" onClick={closeMenu}>
             Buat Resep
