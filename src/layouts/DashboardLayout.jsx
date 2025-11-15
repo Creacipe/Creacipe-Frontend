@@ -154,6 +154,16 @@ const DashboardLayout = () => {
               {sidebarCollapsed && !isMobile ? "CP" : "CREACIPE"}
             </h2>
 
+            {/* Close button - Mobile only */}
+            {isMobile && (
+              <button
+                className="close-btn"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Close sidebar">
+                <X className="close-icon" />
+              </button>
+            )}
+
             {/* Collapse button - Desktop only */}
             {!isMobile && (
               <button
