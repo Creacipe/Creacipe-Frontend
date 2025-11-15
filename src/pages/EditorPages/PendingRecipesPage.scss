@@ -313,6 +313,15 @@
       color: #92400e;
     }
 
+    &.modal-success {
+      background: #d1fae5;
+      padding: 0.875rem;
+      border-radius: 8px;
+      border-left: 4px solid #10b981;
+      font-size: 0.9rem;
+      color: #065f46;
+    }
+
     strong {
       color: #1f2937;
     }
@@ -364,6 +373,17 @@
 
         &:hover {
           box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+      }
+
+      &.btn-confirm-approve {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+          transform: translateY(-1px);
         }
       }
     }

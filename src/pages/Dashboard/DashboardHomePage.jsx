@@ -151,7 +151,7 @@ const DashboardHomePage = () => {
               <ClipboardList className="icon" />
             </span>
             <div>
-              <h4>Moderasi Resep</h4>
+              <h4>Manajemen Resep</h4>
               <p>Review dan approve resep baru</p>
             </div>
           </Link>

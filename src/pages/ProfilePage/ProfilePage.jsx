@@ -43,7 +43,7 @@ const ProfilePage = () => {
     setMessage(null);
 
     try {
-      const response = await userService.updateMyProfile(formData);
+      await userService.updateMyProfile(formData);
 
       // Update user di context
       const updatedProfile = await userService.getMyProfile();

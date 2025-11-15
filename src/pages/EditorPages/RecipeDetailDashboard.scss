@@ -1,0 +1,226 @@
+// LOKASI: src/pages/EditorPages/RecipeDetailDashboard.scss
+
+.recipe-detail-dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+
+  .back-button {
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+
+  .status-badge-container {
+    text-align: center;
+    margin-bottom: 1rem;
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.5rem 1.5rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &.status-pending {
+        background: #fef3c7;
+        color: #92400e;
+        border: 2px solid #fbbf24;
+      }
+
+      &.status-approved {
+        background: #d1fae5;
+        color: #065f46;
+        border: 2px solid #10b981;
+      }
+
+      &.status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 2px solid #ef4444;
+      }
+    }
+  }
+
+  .recipe-title {
+    text-align: center;
+    margin-top: 0;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .recipe-author {
+    display: block;
+    text-align: center;
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .recipe-detail-image {
+    width: 100%;
+    margin-bottom: 2rem;
+
+    img {
+      width: 100%;
+      max-height: 450px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+  }
+
+  .recipe-detail-description {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+
+    .tag-badge {
+      background: #3b82f6;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+      }
+    }
+  }
+
+  .meta-info-section {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+
+    .meta-item {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+
+      strong {
+        font-size: 0.95rem;
+        color: #374151;
+        min-width: 80px;
+      }
+
+      span {
+        font-size: 0.95rem;
+        color: #6b7280;
+      }
+    }
+  }
+
+  .rejection-info {
+    background: #fee2e2;
+    padding: 1.25rem;
+    border-radius: 8px;
+    border-left: 4px solid #ef4444;
+    margin-bottom: 2rem;
+
+    strong {
+      display: block;
+      font-size: 1rem;
+      color: #991b1b;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin: 0;
+      color: #991b1b;
+      line-height: 1.6;
+    }
+  }
+
+  .detail-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  .ingredients-section,
+  .instructions-section {
+    h3 {
+      font-size: 1.5rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    ul,
+    ol {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .recipe-detail-dashboard-container {
+    padding: 1rem;
+
+    .recipe-title {
+      font-size: 1.5rem;
+    }
+
+    .recipe-detail-description {
+      font-size: 1rem;
+    }
+
+    .recipe-detail-image {
+      img {
+        max-height: 300px;
+      }
+    }
+
+    .detail-layout-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ingredients-section,
+    .instructions-section {
+      h3 {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}

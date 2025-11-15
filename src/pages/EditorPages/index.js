@@ -2,5 +2,6 @@
 
 export { default as AllRecipesPage } from "./AllRecipesPage";
 export { default as PendingRecipesPage } from "./PendingRecipesPage";
-export { default as TagManagementPage } from "./TagManagementPage";
-export { default as CategoryManagementPage } from "./CategoryManagementPage";
+export { default as TagManagementPage } from "../TagManagementPage/TagManagementPage";
+export { default as CategoryManagementPage } from "../CategoryManagementPage/CategoryManagementPage";
+export { default as RecipeDetailDashboard } from "./RecipeDetailDashboard";

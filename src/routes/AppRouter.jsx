@@ -30,6 +30,7 @@ import {
   CategoryManagementPage,
   UserManagementPage,
   ActivityLogsPage,
+  RecipeDetailDashboard,
 } from "../pages/Dashboard";
 
 // Routes
@@ -65,6 +66,10 @@ const AppRouter = () => {
             <Route
               path="/dashboard/recipes"
               element={<DashboardAllRecipes />}
+            />
+            <Route
+              path="/dashboard/recipes/:id"
+              element={<RecipeDetailDashboard />}
             />
             <Route
               path="/dashboard/recipes/pending"

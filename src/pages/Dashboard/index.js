@@ -7,7 +7,8 @@ export {
   AllRecipesPage,
   PendingRecipesPage,
   TagManagementPage,
-  CategoryManagementPage 
+  CategoryManagementPage,
+  RecipeDetailDashboard,
 } from "../EditorPages";
 
 // Re-export from AdminPages

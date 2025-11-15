@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { dashboardService } from "../../services/dashboardService";
-import "./PendingRecipesPage.scss";
 import { Eye, CircleCheck, CircleX } from "lucide-react";
+import Toast from "../../components/ui/Toast/Toast";
+import "./PendingRecipesPage.scss";
 
 const PendingRecipesPage = () => {
   const navigate = useNavigate();
@@ -12,8 +13,10 @@ const PendingRecipesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     fetchPendingRecipes();
@@ -34,14 +37,27 @@ const PendingRecipesPage = () => {
   };
 
   const handleApprove = async (recipe) => {
-    if (!window.confirm(`Setujui resep "${recipe.title}"?`)) return;
+    setSelectedRecipe(recipe);
+    setShowApproveModal(true);
+  };
+
+  const handleApproveConfirm = async () => {
+    if (!selectedRecipe) return;
 
     try {
-      await dashboardService.updateMenuStatus(recipe.menu_id, "approved");
+      await dashboardService.updateMenuStatus(
+        selectedRecipe.menu_id,
+        "approved"
+      );
+      setShowApproveModal(false);
+      setSelectedRecipe(null);
       // Remove from list
-      setRecipes((prev) => prev.filter((r) => r.menu_id !== recipe.menu_id));
+      setRecipes((prev) =>
+        prev.filter((r) => r.menu_id !== selectedRecipe.menu_id)
+      );
+      setToast({ type: 'success', message: 'Resep berhasil disetujui!' });
     } catch (err) {
-      alert("Gagal menyetujui resep");
+      setToast({ type: 'error', message: 'Gagal menyetujui resep. Silakan coba lagi.' });
       console.error(err);
     }
   };
@@ -68,9 +84,12 @@ const PendingRecipesPage = () => {
       setSelectedRecipe(null);
       setRejectionReason("");
       // Remove from list
-      setRecipes((prev) => prev.filter((r) => r.menu_id !== selectedRecipe.menu_id));
+      setRecipes((prev) =>
+        prev.filter((r) => r.menu_id !== selectedRecipe.menu_id)
+      );
+      setToast({ type: 'success', message: 'Resep berhasil ditolak!' });
     } catch (err) {
-      alert("Gagal menolak resep");
+      setToast({ type: 'error', message: 'Gagal menolak resep. Silakan coba lagi.' });
       console.error(err);
     }
   };
@@ -78,7 +97,7 @@ const PendingRecipesPage = () => {
   return (
     <div className="pending-recipes-page">
       <div className="page-header">
-        <h2>Tinjau Resep</h2>
+        <h2>Antrian Moderasi</h2>
         <p>Resep yang menunggu persetujuan Anda</p>
       </div>
 
@@ -90,7 +109,7 @@ const PendingRecipesPage = () => {
         <div className="empty-state">
           <div className="empty-icon">✅</div>
           <h3>Tidak Ada Antrian</h3>
-          <p>Semua resep sudah di setujui!</p>
+          <p>Semua resep sudah disetujui!</p>
         </div>
       ) : (
         <>
@@ -119,7 +138,9 @@ const PendingRecipesPage = () => {
                     <div className="meta-item">
                       <span className="icon">📅</span>
                       <span>
-                        {new Date(recipe.created_at).toLocaleDateString("id-ID")}
+                        {new Date(recipe.created_at).toLocaleDateString(
+                          "id-ID"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -138,20 +159,22 @@ const PendingRecipesPage = () => {
                 <div className="card-actions">
                   <button
                     className="btn-view"
-                    onClick={() => navigate(`/menu/${recipe.menu_id}`)}>
-                    <Eye className="Icon"/>
+                    onClick={() =>
+                      navigate(`/dashboard/recipes/${recipe.menu_id}`)
+                    }>
+                    <Eye className="icon" />
                     Lihat Detail
                   </button>
                   <div className="action-group">
                     <button
                       className="btn-approve"
                       onClick={() => handleApprove(recipe)}>
-                      <CircleCheck className="Icon"/> Setujui
+                      <CircleCheck className="icon" /> Setujui
                     </button>
                     <button
                       className="btn-reject"
                       onClick={() => handleRejectClick(recipe)}>
-                      <CircleX className="Icon"/> Tolak
+                      <CircleX className="icon" /> Tolak
                     </button>
                   </div>
                 </div>
@@ -161,16 +184,50 @@ const PendingRecipesPage = () => {
         </>
       )}
 
+      {/* Approve Modal */}
+      {showApproveModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowApproveModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Setujui Resep</h3>
+            <p>
+              Apakah Anda yakin ingin menyetujui resep{" "}
+              <strong>"{selectedRecipe?.title}"</strong>?
+            </p>
+            <p className="modal-success">
+              Resep yang disetujui akan dipublikasikan dan dapat dilihat oleh
+              semua pengguna.
+            </p>
+            <div className="modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowApproveModal(false)}>
+                Batal
+              </button>
+              <button
+                className="btn-confirm-approve"
+                onClick={handleApproveConfirm}>
+                Setujui Resep
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Reject Modal */}
       {showRejectModal && (
-        <div className="modal-overlay" onClick={() => setShowRejectModal(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowRejectModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Tolak Resep</h3>
             <p>
               Resep: <strong>{selectedRecipe?.title}</strong>
             </p>
             <p className="modal-note">
-              Alasan penolakan akan dikirimkan ke pembuat resep sebagai feedback.
+              Alasan penolakan akan dikirimkan ke pembuat resep sebagai
+              feedback.
             </p>
             <textarea
               placeholder="Tuliskan alasan penolakan (misal: gambar tidak sesuai, konten duplikat, dll)..."
@@ -179,7 +236,9 @@ const PendingRecipesPage = () => {
               rows="5"
             />
             <div className="modal-actions">
-              <button className="btn-cancel" onClick={() => setShowRejectModal(false)}>
+              <button
+                className="btn-cancel"
+                onClick={() => setShowRejectModal(false)}>
                 Batal
               </button>
               <button className="btn-confirm" onClick={handleRejectConfirm}>
@@ -188,6 +247,15 @@ const PendingRecipesPage = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
