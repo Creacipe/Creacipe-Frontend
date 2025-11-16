@@ -33,9 +33,6 @@ const CategoryManagementPage = () => {
         tagService.getAllTags(),
       ]);
 
-      console.log("Categories response:", categoriesRes.data);
-      console.log("Tags response:", tagsRes.data);
-
       setCategories(categoriesRes.data.data || []);
       setTags(tagsRes.data.data || []);
     } catch (err) {

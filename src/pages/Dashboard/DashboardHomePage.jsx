@@ -21,7 +21,7 @@ const DashboardHomePage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.Role?.role_name === "admin";
 
   useEffect(() => {
     fetchStats();

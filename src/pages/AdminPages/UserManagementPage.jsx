@@ -1,7 +1,17 @@
-// LOKASI: src/pages/Dashboard/UserManagementPage.jsx
+// LOKASI: src/pages/AdminPages/UserManagementPage.jsx
 
 import React, { useState, useEffect } from "react";
 import { dashboardService } from "../../services/dashboardService";
+import {
+  UserPlus,
+  Edit,
+  Key,
+  Lock,
+  Unlock,
+  Trash2,
+  Search,
+} from "lucide-react";
+import Toast from "../../components/ui/Toast/Toast";
 import "./UserManagementPage.scss";
 
 const UserManagementPage = () => {
@@ -9,8 +19,16 @@ const UserManagementPage = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [userToToggle, setUserToToggle] = useState(null);
   const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', or 'role'
   const [selectedUser, setSelectedUser] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -74,10 +92,19 @@ const UserManagementPage = () => {
     try {
       if (modalMode === "create") {
         if (!formData.password) {
-          alert("Password wajib diisi untuk user baru!");
+          setToast({
+            type: "error",
+            message: "Password wajib diisi untuk user baru!",
+          });
           return;
         }
-        await dashboardService.createUser(formData);
+        // Convert role_id to number before sending
+        const createData = {
+          ...formData,
+          role_id: parseInt(formData.role_id, 10),
+        };
+        await dashboardService.createUser(createData);
+        setToast({ type: "success", message: "User berhasil dibuat!" });
       } else if (modalMode === "edit") {
         const updateData = {
           name: formData.name,
@@ -87,41 +114,80 @@ const UserManagementPage = () => {
           updateData.password = formData.password;
         }
         await dashboardService.updateUser(selectedUser.user_id, updateData);
+        setToast({ type: "success", message: "User berhasil diperbarui!" });
       } else if (modalMode === "role") {
-        await dashboardService.updateUserRole(selectedUser.user_id, formData.role_id);
+        // Convert role_id to number before sending
+        await dashboardService.updateUserRole(
+          selectedUser.user_id,
+          parseInt(formData.role_id, 10)
+        );
+        setToast({ type: "success", message: "Role user berhasil diubah!" });
       }
       handleCloseModal();
       fetchData();
     } catch (err) {
-      alert("Gagal menyimpan user");
+      setToast({
+        type: "error",
+        message: "Gagal menyimpan user. Silakan coba lagi.",
+      });
       console.error(err);
     }
   };
 
   const handleToggleStatus = async (user) => {
+    setUserToToggle(user);
+    setShowStatusModal(true);
+  };
+
+  const handleToggleStatusConfirm = async () => {
+    if (!userToToggle) return;
+
+    // Normalize status - handle both snake_case and PascalCase
+    const currentStatus =
+      userToToggle.status_user || userToToggle.StatusUser || "active";
+    const isActive = currentStatus === "active";
+
     try {
-      if (user.is_active) {
-        await dashboardService.deactivateUser(user.user_id);
+      if (isActive) {
+        await dashboardService.deactivateUser(userToToggle.user_id);
+        setToast({ type: "success", message: "User berhasil dinonaktifkan!" });
       } else {
-        await dashboardService.activateUser(user.user_id);
+        await dashboardService.activateUser(userToToggle.user_id);
+        setToast({ type: "success", message: "User berhasil diaktifkan!" });
       }
+      setShowStatusModal(false);
+      setUserToToggle(null);
       fetchData();
     } catch (err) {
-      alert("Gagal mengubah status user");
+      setToast({
+        type: "error",
+        message: "Gagal mengubah status user. Silakan coba lagi.",
+      });
       console.error(err);
     }
   };
 
-  const handleDelete = async (user) => {
-    if (!window.confirm(`Hapus user "${user.name}"? Tindakan ini tidak dapat dibatalkan!`)) {
-      return;
-    }
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
 
     try {
-      await dashboardService.deleteUser(user.user_id);
+      await dashboardService.deleteUser(userToDelete.user_id);
+      setShowDeleteModal(false);
+      setUserToDelete(null);
       fetchData();
+      setToast({ type: "success", message: "User berhasil dihapus!" });
     } catch (err) {
-      alert("Gagal menghapus user");
+      setToast({
+        type: "error",
+        message:
+          err.response?.data?.message ||
+          "Gagal menghapus user. Silakan coba lagi.",
+      });
       console.error(err);
     }
   };
@@ -131,8 +197,35 @@ const UserManagementPage = () => {
       admin: { text: "Admin", class: "role-admin" },
       editor: { text: "Editor", class: "role-editor" },
       user: { text: "User", class: "role-user" },
+      member: { text: "Member", class: "role-user" },
     };
     return badges[roleName] || { text: roleName, class: "role-default" };
+  };
+
+  // Normalize status - handle both snake_case and PascalCase
+  const getUserStatus = (user) => {
+    const status = user.status_user || user.StatusUser || "active";
+    return status === "active";
+  };
+
+  // Filter berdasarkan search query
+  const filteredUsers = users.filter((user) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      user.name?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.Role?.role_name?.toLowerCase().includes(query)
+    );
+  });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -142,9 +235,31 @@ const UserManagementPage = () => {
           <h2>Manajemen Pengguna</h2>
           <p>Kelola akun pengguna, role, dan status</p>
         </div>
-        <button className="btn-create" onClick={() => handleOpenModal("create")}>
-          ➕ Tambah User Baru
+        <button
+          className="btn-create"
+          onClick={() => handleOpenModal("create")}>
+          <UserPlus size={20} />
+          <span>Tambah User Baru</span>
         </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="search-section">
+        <div className="search-box">
+          <Search className="search-icon" />
+          <input
+            type="text"
+            placeholder="Cari nama, email, atau role..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1); // Reset ke halaman pertama saat search
+            }}
+          />
+        </div>
+        <div className="search-info">
+          Menampilkan {currentUsers.length} dari {filteredUsers.length} user
+        </div>
       </div>
 
       {loading ? (
@@ -154,7 +269,7 @@ const UserManagementPage = () => {
           <table className="users-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Nama</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -164,11 +279,14 @@ const UserManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => {
+              {currentUsers.map((user, index) => {
                 const roleBadge = getRoleBadge(user.Role?.role_name);
+                const isActive = getUserStatus(user);
+                const rowNumber = indexOfFirstItem + index + 1;
+
                 return (
                   <tr key={user.user_id}>
-                    <td>{user.user_id}</td>
+                    <td>{rowNumber}</td>
                     <td>
                       <strong>{user.name}</strong>
                     </td>
@@ -179,36 +297,43 @@ const UserManagementPage = () => {
                       </span>
                     </td>
                     <td>
-                      <span className={`status-badge ${user.is_active ? "active" : "inactive"}`}>
-                        {user.is_active ? "Aktif" : "Nonaktif"}
+                      <span
+                        className={`status-badge ${
+                          isActive ? "active" : "inactive"
+                        }`}>
+                        {isActive ? "Aktif" : "Nonaktif"}
                       </span>
                     </td>
-                    <td>{new Date(user.created_at).toLocaleDateString("id-ID")}</td>
+                    <td>
+                      {new Date(user.created_at).toLocaleDateString("id-ID")}
+                    </td>
                     <td>
                       <div className="action-buttons">
                         <button
                           className="btn-action btn-edit"
                           onClick={() => handleOpenModal("edit", user)}
                           title="Edit">
-                          ✏️
+                          <Edit size={18} />
                         </button>
                         <button
                           className="btn-action btn-role"
                           onClick={() => handleOpenModal("role", user)}
                           title="Ubah Role">
-                          🔑
+                          <Key size={18} />
                         </button>
                         <button
-                          className={`btn-action ${user.is_active ? "btn-deactivate" : "btn-activate"}`}
+                          className={`btn-action ${
+                            isActive ? "btn-deactivate" : "btn-activate"
+                          }`}
                           onClick={() => handleToggleStatus(user)}
-                          title={user.is_active ? "Nonaktifkan" : "Aktifkan"}>
-                          {user.is_active ? "🔒" : "🔓"}
+                          title={isActive ? "Nonaktifkan" : "Aktifkan"}>
+                          {isActive ? <Lock size={18} /> : <Unlock size={18} />}
                         </button>
                         <button
                           className="btn-action btn-delete"
-                          onClick={() => handleDelete(user)}
+                          onClick={() => handleDeleteClick(user)}
                           title="Hapus">
-                          🗑️
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
@@ -217,6 +342,39 @@ const UserManagementPage = () => {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!loading && filteredUsers.length > 0 && (
+        <div className="pagination">
+          <button
+            className="pagination-btn"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}>
+            Previous
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => {
+            const pageNumber = index + 1;
+            return (
+              <button
+                key={pageNumber}
+                className={`pagination-btn ${
+                  currentPage === pageNumber ? "active" : ""
+                }`}
+                onClick={() => handlePageChange(pageNumber)}>
+                {pageNumber}
+              </button>
+            );
+          })}
+
+          <button
+            className="pagination-btn"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}>
+            Next
+          </button>
         </div>
       )}
 
@@ -237,11 +395,14 @@ const UserManagementPage = () => {
                   <select
                     id="role_id"
                     value={formData.role_id}
-                    onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, role_id: e.target.value })
+                    }
                     required>
                     {roles.map((role) => (
                       <option key={role.role_id} value={role.role_id}>
-                        {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
+                        {role.role_name.charAt(0).toUpperCase() +
+                          role.role_name.slice(1)}
                       </option>
                     ))}
                   </select>
@@ -254,7 +415,9 @@ const UserManagementPage = () => {
                       type="text"
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       placeholder="Masukkan nama lengkap"
                       required
                     />
@@ -266,7 +429,9 @@ const UserManagementPage = () => {
                       type="email"
                       id="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       placeholder="user@example.com"
                       required
                     />
@@ -274,13 +439,16 @@ const UserManagementPage = () => {
 
                   <div className="form-group">
                     <label htmlFor="password">
-                      Password {modalMode === "edit" && "(kosongkan jika tidak diubah)"}
+                      Password{" "}
+                      {modalMode === "edit" && "(kosongkan jika tidak diubah)"}
                     </label>
                     <input
                       type="password"
                       id="password"
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
                       placeholder="Minimal 6 karakter"
                       required={modalMode === "create"}
                     />
@@ -291,11 +459,14 @@ const UserManagementPage = () => {
                     <select
                       id="role_id"
                       value={formData.role_id}
-                      onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, role_id: e.target.value })
+                      }
                       required>
                       {roles.map((role) => (
                         <option key={role.role_id} value={role.role_id}>
-                          {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
+                          {role.role_name.charAt(0).toUpperCase() +
+                            role.role_name.slice(1)}
                         </option>
                       ))}
                     </select>
@@ -304,7 +475,10 @@ const UserManagementPage = () => {
               )}
 
               <div className="modal-actions">
-                <button type="button" className="btn-cancel" onClick={handleCloseModal}>
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={handleCloseModal}>
                   Batal
                 </button>
                 <button type="submit" className="btn-submit">
@@ -314,6 +488,83 @@ const UserManagementPage = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Hapus User</h3>
+            <p>
+              Apakah Anda yakin ingin menghapus user{" "}
+              <strong>"{userToDelete?.name}"</strong>?
+            </p>
+            <p className="modal-warning">
+              Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowDeleteModal(false)}>
+                Batal
+              </button>
+              <button
+                className="btn-confirm-delete"
+                onClick={handleDeleteConfirm}>
+                Hapus User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Toggle Confirmation Modal */}
+      {showStatusModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowStatusModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Ubah Status User</h3>
+            <p>
+              Apakah Anda yakin ingin{" "}
+              <strong>
+                {getUserStatus(userToToggle) ? "menonaktifkan" : "mengaktifkan"}
+              </strong>{" "}
+              user <strong>"{userToToggle?.name}"</strong>?
+            </p>
+            {getUserStatus(userToToggle) && (
+              <p className="modal-warning">
+                User yang dinonaktifkan tidak dapat login ke sistem.
+              </p>
+            )}
+            <div className="modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowStatusModal(false)}>
+                Batal
+              </button>
+              <button
+                className={
+                  getUserStatus(userToToggle)
+                    ? "btn-confirm-delete"
+                    : "btn-submit"
+                }
+                onClick={handleToggleStatusConfirm}>
+                {getUserStatus(userToToggle) ? "Nonaktifkan" : "Aktifkan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
