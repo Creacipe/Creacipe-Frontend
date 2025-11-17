@@ -250,7 +250,15 @@ const DashboardLayout = () => {
                 sidebarCollapsed && !isMobile ? "centered" : ""
               }`}>
               <div className="user-avatar">
-                <User className="avatar-icon" />
+                {user?.Profile?.profile_picture_url ? (
+                  <img
+                    src={`http://localhost:8080${user.Profile.profile_picture_url}`}
+                    alt={user?.name}
+                    className="avatar-image"
+                  />
+                ) : (
+                  <User className="avatar-icon" />
+                )}
               </div>
               {(!sidebarCollapsed || isMobile) && (
                 <div className="user-details">

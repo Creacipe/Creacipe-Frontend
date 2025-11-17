@@ -48,6 +48,11 @@ const Profile = () => {
   const displayName = user.Name || user.name || "User";
   const displayEmail = user.Email || user.email || "";
 
+  // Ambil foto profil dari user data
+  const profilePicture = user.Profile?.profile_picture_url
+    ? `http://localhost:8080${user.Profile.profile_picture_url}`
+    : null;
+
   // Cek apakah user adalah admin atau editor
   const userRole = user.role || user.Role?.role_name;
   const isAdminOrEditor = userRole === "admin" || userRole === "editor";
@@ -60,7 +65,15 @@ const Profile = () => {
       {/* Toggle button hanya muncul di desktop */}
       {!isMobile && (
         <button onClick={() => setIsOpen(!isOpen)} className="dropdown-toggle">
-          {displayName}
+          {profilePicture ? (
+            <img
+              src={profilePicture}
+              alt={displayName}
+              className="dropdown-avatar"
+            />
+          ) : (
+            <div className="dropdown-avatar-placeholder">👤</div>
+          )}
           <span>▼</span>
         </button>
       )}
@@ -69,8 +82,19 @@ const Profile = () => {
       {showMenu && (
         <div className="dropdown-menu">
           <div className="dropdown-header">
-            <strong>{displayName}</strong>
-            {displayEmail && <small>{displayEmail}</small>}
+            {profilePicture ? (
+              <img
+                src={profilePicture}
+                alt={displayName}
+                className="dropdown-header-avatar"
+              />
+            ) : (
+              <div className="dropdown-header-avatar-placeholder">👤</div>
+            )}
+            <div className="dropdown-header-text">
+              <strong>{displayName}</strong>
+              {displayEmail && <small>{displayEmail}</small>}
+            </div>
           </div>
 
           <Link to="/profile" className="dropdown-item" onClick={closeMenu}>
