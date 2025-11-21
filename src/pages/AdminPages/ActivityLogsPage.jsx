@@ -240,6 +240,10 @@ const ActivityLogsPage = () => {
       UPDATE_USER_ROLE: { verb: `mengubah role user`, targetType: "user" },
       VOTE_MENU: { verb: `menyukai resep`, targetType: "menu" },
       UNVOTE_MENU: { verb: `tidak menyukai resep`, targetType: "menu" },
+      REQUEST_PASSWORD_RESET: { verb: `meminta reset password`, targetType: null },
+      PASSWORD_RESET_SUCCESS: { verb: `berhasil reset password`, targetType: null },
+      REQUEST_EMAIL_CHANGE: { verb: `meminta ubah email`, targetType: null },
+      EMAIL_CHANGE_SUCCESS: { verb: `berhasil ubah email`, targetType: null },
       LOGIN: { verb: `user login`, targetType: null },
       LOGOUT: { verb: `user logout`, targetType: null },
     };

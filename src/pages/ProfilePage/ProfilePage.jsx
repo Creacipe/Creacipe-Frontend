@@ -101,7 +101,6 @@ const ProfilePage = () => {
       // Buat FormData untuk support file upload
       const formData = new FormData();
       formData.append("name", editForm.name);
-      formData.append("email", editForm.email || "");
       formData.append("bio", editForm.bio || "");
 
       // Tambahkan file gambar jika ada
@@ -519,26 +518,11 @@ const ProfilePage = () => {
                     <Mail className="info-icon" />
                     Email
                   </label>
-                  {isEditing ? (
-                    <div className="input-wrapper">
-                      <input
-                        type="email"
-                        name="email"
-                        value={editForm.email}
-                        onChange={handleEditChange}
-                        className={`input ${errors.email ? "error" : ""}`}
-                        placeholder="email@example.com"
-                        data-testid="input-email"
-                      />
-                      {errors.email && (
-                        <span className="error-message">{errors.email}</span>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="info-value" data-testid="display-email">
-                      {user.email}
-                    </p>
-                  )}
+                  <p
+                    className="info-value info-readonly"
+                    data-testid="display-email">
+                    {user.email}
+                  </p>
                 </div>
 
                 {/* Bio */}
