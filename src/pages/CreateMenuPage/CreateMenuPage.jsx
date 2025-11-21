@@ -10,9 +10,13 @@ const CreateMenuPage = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState(null); // State untuk file
-  const [imagePreview, setImagePreview] = useState(null);
-  const [ingredients, setIngredients] = useState([""]);
-  const [instructions, setInstructions] = useState([""]);
+  const [imagePreview, setImagePreview] = useState(null); // State untuk preview
+  const [ingredients, setIngredients] = useState([
+    { id: Date.now(), value: "" },
+  ]);
+  const [instructions, setInstructions] = useState([
+    { id: Date.now() + 1, value: "" },
+  ]);
 
   // --- STATE BARU UNTUK TAGS ---
   const [allTags, setAllTags] = useState([]); // Menampung semua tag dari DB
@@ -28,11 +32,18 @@ const CreateMenuPage = () => {
     const fetchTags = async () => {
       try {
         const response = await tagService.getAllTags();
+
         // Backend mengirim { data: [...] }, dan GORM mengirim 'TagID' dan 'TagName'
-        setAllTags(response.data.data);
-      } catch (err) {
-        console.error("Gagal mengambil tags:", err);
-        // Biarkan 'allTags' kosong jika gagal
+        if (response && response.data && response.data.data) {
+          setAllTags(response.data.data);
+        } else if (response && response.data && Array.isArray(response.data)) {
+          // Fallback jika response langsung array
+          setAllTags(response.data);
+        } else {
+          setAllTags([]);
+        }
+      } catch {
+        setAllTags([]); // Set empty array jika gagal
       }
     };
 
@@ -43,11 +54,11 @@ const CreateMenuPage = () => {
   // --- (Semua fungsi handler untuk Bahan & Instruksi tetap sama) ---
   const handleIngredientChange = (index, value) => {
     const newIngredients = [...ingredients];
-    newIngredients[index] = value;
+    newIngredients[index].value = value;
     setIngredients(newIngredients);
   };
   const handleAddIngredient = () => {
-    setIngredients([...ingredients, ""]);
+    setIngredients([...ingredients, { id: Date.now(), value: "" }]);
   };
   const handleRemoveIngredient = (index) => {
     const newIngredients = [...ingredients];
@@ -56,11 +67,11 @@ const CreateMenuPage = () => {
   };
   const handleInstructionChange = (index, value) => {
     const newInstructions = [...instructions];
-    newInstructions[index] = value;
+    newInstructions[index].value = value;
     setInstructions(newInstructions);
   };
   const handleAddInstruction = () => {
-    setInstructions([...instructions, ""]);
+    setInstructions([...instructions, { id: Date.now(), value: "" }]);
   };
   const handleRemoveInstruction = (index) => {
     const newInstructions = [...instructions];
@@ -81,12 +92,13 @@ const CreateMenuPage = () => {
     });
   };
   // ------------------------------------------
+
   // --- 4. HANDLER UNTUK UPLOAD GAMBAR + PREVIEW ---
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      
+
       // Buat preview URL dari file
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -104,7 +116,8 @@ const CreateMenuPage = () => {
       }
     };
   }, [imagePreview]);
-  // 
+  // ---------------------------------------------
+  // -----------------------------------------------------------------
 
   // --- INI ADALAH FUNGSI YANG BERUBAH TOTAL ---
   const handleSubmit = async (e) => {
@@ -112,9 +125,13 @@ const CreateMenuPage = () => {
     setError(null);
     setSuccess(null);
 
-    // 1. Filter input yang kosong
-    const filteredIngredients = ingredients.filter((i) => i.trim() !== "");
-    const filteredInstructions = instructions.filter((i) => i.trim() !== "");
+    // 1. Filter input yang kosong dan extract value
+    const filteredIngredients = ingredients
+      .map((item) => item.value)
+      .filter((i) => i.trim() !== "");
+    const filteredInstructions = instructions
+      .map((item) => item.value)
+      .filter((i) => i.trim() !== "");
 
     // 2. Ubah array kita menjadi JSON string (backend tetap menerima ini)
     const ingredientsJSON = JSON.stringify(filteredIngredients);
@@ -186,11 +203,11 @@ const CreateMenuPage = () => {
         <div style={{ marginTop: "1rem" }}>
           <label>Bahan-bahan</label>
           {ingredients.map((ingredient, index) => (
-            <div key={index} className="dynamic-input-row">
+            <div key={ingredient.id} className="dynamic-input-row">
               <input
                 type="text"
                 placeholder="Contoh: 1/2 ekor ayam"
-                value={ingredient}
+                value={ingredient.value}
                 onChange={(e) => handleIngredientChange(index, e.target.value)}
               />
               <button
@@ -212,11 +229,11 @@ const CreateMenuPage = () => {
         <div style={{ marginTop: "1rem" }}>
           <label>Langkah-langkah</label>
           {instructions.map((step, index) => (
-            <div key={index} className="dynamic-input-row">
+            <div key={step.id} className="dynamic-input-row">
               <input
                 type="text"
                 placeholder="Contoh: Tumis bumbu hingga harum"
-                value={step}
+                value={step.value}
                 onChange={(e) => handleInstructionChange(index, e.target.value)}
               />
               <button
@@ -253,10 +270,7 @@ const CreateMenuPage = () => {
           {/* Preview Gambar */}
           {imagePreview && (
             <div className="image-preview-container">
-              <img 
-                src={imagePreview} 
-                alt="Preview Gambar" 
-              />
+              <img src={imagePreview} alt="Preview Gambar" />
             </div>
           )}
         </div>
@@ -264,21 +278,23 @@ const CreateMenuPage = () => {
 
         {/* --- 5. RENDER CHECKBOX TAGS --- */}
         <div style={{ marginTop: "1rem" }}>
-          <label>Pilih Tag (Opsional)</label>
+          <label>Pilih Tag</label>
           <div className="tag-checkbox-container">
-            {allTags.length > 0 ? (
+            {allTags && allTags.length > 0 ? (
               allTags.map((tag) => (
-                <div key={tag.TagID} className="tag-checkbox-item">
+                <div
+                  key={tag.TagID || tag.tag_id}
+                  className="tag-checkbox-item">
                   <input
                     type="checkbox"
-                    id={`tag-${tag.TagID}`}
-                    value={tag.TagID}
-                    // Cek apakah 'tag.TagID' ada di dalam array 'selectedTags'
-                    checked={selectedTags.includes(tag.TagID)}
-                    onChange={() => handleTagChange(tag.TagID)}
+                    id={`tag-${tag.TagID || tag.tag_id}`}
+                    value={tag.TagID || tag.tag_id}
+                    checked={selectedTags.includes(tag.TagID || tag.tag_id)}
+                    onChange={() => handleTagChange(tag.TagID || tag.tag_id)}
                   />
-                  {/* Kita tampilkan 'TagName' dari data API */}
-                  <label htmlFor={`tag-${tag.TagID}`}>{tag.TagName}</label>
+                  <label htmlFor={`tag-${tag.TagID || tag.tag_id}`}>
+                    {tag.TagName || tag.tag_name || tag.name}
+                  </label>
                 </div>
               ))
             ) : (

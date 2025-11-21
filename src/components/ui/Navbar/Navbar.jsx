@@ -3,8 +3,8 @@
 import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-// 1. Ubah import ini
-import Profile from '../Profile/Profile'; // <-- Path dan nama komponen diubah
+import Profile from '../Profile/Profile';
+import NotificationBell from "../NotificationBell/NotificationBell";
 import './Navbar.scss';
 
 const Navbar = () => {
@@ -25,9 +25,14 @@ const Navbar = () => {
       return null;
     }
 
-    // 2. Gunakan komponen 'Profile' di sini
+   //komponen ketika sudah login
     if (isLoggedIn) {
-      return <Profile />; // <-- Gunakan nama baru
+      return (
+        <div className="navbar-actions">
+          <NotificationBell />
+          <Profile />
+        </div>
+      );
     }
 
     return (

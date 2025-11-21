@@ -92,7 +92,9 @@
 }
 
 .dropdown-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   width: 100%;
   padding: 0.75rem 1rem;
   color: #333;
@@ -101,6 +103,10 @@
   border: none;
   text-align: left;
   cursor: pointer;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
     background-color: #f4f6f8;
@@ -154,6 +160,39 @@
 
   &:hover {
     background-color: #fce8e6;
+  }
+}
+
+// Styling untuk notification badge di menu dropdown
+.notif-menu-item {
+  position: relative;
+
+  .notif-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    min-width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
   }
 }
 

@@ -78,6 +78,12 @@
     }
   }
 
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .navbar-login-button {
     color: #fff;
     background-color: #007bff;

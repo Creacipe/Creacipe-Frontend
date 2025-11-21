@@ -21,6 +21,8 @@ import AllRecipesPage from "../pages/AllRecipesPage/AllRecipesPage";
 import MyRecipesPage from "../pages/MyRecipesPage/MyRecipesPage";
 import SavedRecipesPage from "../pages/SavedRecipesPage/SavedRecipesPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
+import ActivitiesPage from "../pages/ActivitiesPage/ActivitiesPage";
+import CommentsPage from "../pages/CommentsPage/CommentsPage";
 
 // Dashboard Pages (Editor & Admin)
 import {
@@ -48,6 +50,7 @@ const AppRouter = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/menu/:id" element={<RecipeDetailPage />} />
+          <Route path="/menu/:id/comments" element={<CommentsPage />} />
 
           {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
@@ -57,6 +60,7 @@ const AppRouter = () => {
             <Route path="/collection/my-recipes" element={<MyRecipesPage />} />
             <Route path="/collection/saved" element={<SavedRecipesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/activities" element={<ActivitiesPage />} />
           </Route>
         </Route>
 
