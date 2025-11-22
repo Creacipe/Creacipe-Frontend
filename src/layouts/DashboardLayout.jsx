@@ -16,6 +16,7 @@ import {
   LogOut,
   ChevronDown,
   ChevronUp,
+  BarChart3,
 } from "lucide-react";
 import "./DashboardLayout.scss";
 
@@ -52,7 +53,7 @@ const DashboardLayout = () => {
     if (isMobile && sidebarOpen) {
       setSidebarOpen(false);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isMobile, sidebarOpen]);
 
   // Handle overlay fade-in/out with delay for smooth animation
   useEffect(() => {
@@ -120,6 +121,12 @@ const DashboardLayout = () => {
       title: "Manajemen User",
       icon: <Users className="icon" />,
       path: "/dashboard/users",
+      roles: [1], // Admin only
+    },
+    {
+      title: "Reporting",
+      icon: <BarChart3 className="icon" />,
+      path: "/dashboard/reporting",
       roles: [1], // Admin only
     },
     {
