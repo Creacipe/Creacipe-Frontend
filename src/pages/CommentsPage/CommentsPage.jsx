@@ -1,7 +1,14 @@
 // LOKASI: src/pages/CommentsPage/CommentsPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { MessageCircle, Send, Trash2, ArrowLeft, User } from "lucide-react";
+import {
+  MessageCircle,
+  Send,
+  Trash2,
+  ArrowLeft,
+  User,
+  Reply,
+} from "lucide-react";
 import { commentService } from "../../services/commentService";
 import { menuService } from "../../services/menuService";
 import { useAuth } from "../../context/AuthContext";
@@ -11,13 +18,15 @@ const CommentsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [menu, setMenu] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [replyingTo, setReplyingTo] = useState(null); // { commentId, userName }
+  const [replyText, setReplyText] = useState("");
 
   // Fetch menu info dan comments
   const fetchMenuAndComments = useCallback(async () => {
@@ -28,7 +37,7 @@ const CommentsPage = () => {
         menuService.getMenuById(id),
         commentService.getCommentsByMenu(id),
       ]);
-      
+
       setMenu(menuRes.data.data);
       setComments(commentsRes.data.data || []);
     } catch (err) {
@@ -54,15 +63,39 @@ const CommentsPage = () => {
     setError(null);
 
     try {
-      await commentService.createComment(id, newComment);
+      await commentService.createComment(id, newComment, null);
       setNewComment("");
       await fetchMenuAndComments();
-      
+
       // Trigger refresh badge
-      window.dispatchEvent(new Event('notification-read'));
+      window.dispatchEvent(new Event("notification-read"));
     } catch (err) {
       const errorMsg = err.response?.data?.error || "Gagal mengirim komentar";
       setError(errorMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmitReply = async (e) => {
+    e.preventDefault();
+    if (!replyText.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await commentService.createComment(id, replyText, replyingTo.commentId);
+      setReplyText("");
+      setReplyingTo(null);
+      await fetchMenuAndComments();
+
+      // Trigger refresh badge
+      window.dispatchEvent(new Event("notification-read"));
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || "Gagal mengirim balasan";
+      alert(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -103,25 +136,47 @@ const CommentsPage = () => {
   if (isLoading) {
     return (
       <div className="comments-page">
-        <div className="loading">Memuat...</div>
+        <div className="loading">
+          <MessageCircle size={48} />
+          <p>Memuat komentar...</p>
+        </div>
       </div>
     );
   }
 
-  const isOwnRecipe = menu && user && menu.user_id === user.UserID;
+  if (error) {
+    return (
+      <div className="comments-page">
+        <div className="error-state">
+          <p>{error}</p>
+          <button onClick={() => navigate(-1)}>Kembali</button>
+        </div>
+      </div>
+    );
+  }
+
+  const isOwnRecipe = menu && user && menu.user_id === user.user_id;
 
   return (
     <div className="comments-page">
       <div className="comments-header">
-        <button onClick={() => navigate(`/menu/${id}`)} className="back-btn">
+        <button
+          onClick={() => navigate(`/menu/${id}`, { replace: true })}
+          className="back-btn">
           <ArrowLeft size={20} />
           <span>Kembali ke Resep</span>
         </button>
-        
+
         {menu && (
           <div className="recipe-info">
             <h2>{menu.title}</h2>
-            <p className="recipe-author">oleh {menu.user?.name || "Unknown"}</p>
+            <p className="recipe-author">
+              oleh{" "}
+              {menu.User?.name ||
+                menu.User?.Name ||
+                menu.user?.name ||
+                "Unknown"}
+            </p>
           </div>
         )}
       </div>
@@ -132,44 +187,42 @@ const CommentsPage = () => {
           <h3>Komentar ({comments.length})</h3>
         </div>
 
-        {/* Form Add Comment - Hide if own recipe */}
-        {user && !isOwnRecipe && (
+        {/* Form Add Comment - Tersedia untuk semua user yang login */}
+        {user && (
           <form onSubmit={handleSubmitComment} className="comment-form">
             <div className="form-header">
               <div className="user-avatar">
-                {user.Profile?.profile_picture_url ? (
+                {user.profile?.profile_picture_url ? (
                   <img
-                    src={`http://localhost:8080${user.Profile.profile_picture_url}`}
-                    alt={user.Name}
+                    src={`http://localhost:8080${user.profile.profile_picture_url}`}
+                    alt={user.name}
                   />
                 ) : (
                   <User size={24} />
                 )}
               </div>
-              <span className="user-name">{user.Name}</span>
+              <span className="user-name">{user.name}</span>
             </div>
-            
+
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Tulis komentar Anda..."
+              placeholder={
+                isOwnRecipe
+                  ? "Berikan tips atau informasi tambahan untuk resep Anda..."
+                  : "Tulis komentar Anda..."
+              }
               rows="4"
               disabled={isSubmitting}
             />
-            
+
             {error && <p className="error-message">{error}</p>}
-            
+
             <button type="submit" disabled={isSubmitting || !newComment.trim()}>
               <Send size={18} />
               {isSubmitting ? "Mengirim..." : "Kirim Komentar"}
             </button>
           </form>
-        )}
-
-        {isOwnRecipe && (
-          <div className="info-box">
-            <p>Anda adalah pemilik resep ini. Hanya pengguna lain yang dapat berkomentar.</p>
-          </div>
         )}
 
         {!user && (
@@ -190,36 +243,145 @@ const CommentsPage = () => {
             </div>
           ) : (
             comments.map((comment) => (
-              <div key={comment.comment_id} className="comment-item">
-                <div className="comment-avatar">
-                  {comment.user_avatar ? (
-                    <img
-                      src={`http://localhost:8080${comment.user_avatar}`}
-                      alt={comment.user_name}
-                    />
-                  ) : (
-                    <User size={32} />
-                  )}
-                </div>
-                
-                <div className="comment-content">
-                  <div className="comment-header">
-                    <span className="comment-author">{comment.user_name}</span>
-                    <span className="comment-time">{formatDate(comment.created_at)}</span>
+              <div key={comment.comment_id} className="comment-thread">
+                {/* Main Comment */}
+                <div className="comment-item">
+                  <div className="comment-avatar">
+                    {comment.user_avatar ? (
+                      <img
+                        src={`http://localhost:8080${comment.user_avatar}`}
+                        alt={comment.user_name}
+                      />
+                    ) : (
+                      <User size={32} />
+                    )}
                   </div>
-                  
-                  <p className="comment-text">{comment.comment_text}</p>
-                  
-                  {user && comment.user_id === user.UserID && (
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteComment(comment.comment_id)}
-                    >
-                      <Trash2 size={16} />
-                      Hapus
-                    </button>
-                  )}
+
+                  <div className="comment-content">
+                    <div className="comment-header">
+                      <span className="comment-author">
+                        {comment.user_name}
+                      </span>
+                      <span className="comment-time">
+                        {formatDate(comment.created_at)}
+                      </span>
+                    </div>
+
+                    <p className="comment-text">{comment.comment_text}</p>
+
+                    <div className="comment-actions">
+                      {user && comment.user_id === user.user_id && (
+                        <button
+                          className="delete-btn"
+                          onClick={() =>
+                            handleDeleteComment(comment.comment_id)
+                          }>
+                          <Trash2 size={14} />
+                          Hapus
+                        </button>
+                      )}
+
+                      {/* Tombol Reply - muncul untuk semua user yang login */}
+                      {user && (
+                        <button
+                          className="reply-btn"
+                          onClick={() => {
+                            setReplyingTo({
+                              commentId: comment.comment_id,
+                              userName: comment.user_name,
+                            });
+                            setReplyText("");
+                          }}>
+                          <Reply size={14} />
+                          Balas
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Reply Form */}
+                    {replyingTo?.commentId === comment.comment_id && (
+                      <form onSubmit={handleSubmitReply} className="reply-form">
+                        <div className="reply-to-info">
+                          Membalas <strong>@{replyingTo.userName}</strong>
+                        </div>
+                        <div className="reply-input-group">
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder={`Balas ke ${replyingTo.userName}...`}
+                            rows="3"
+                            disabled={isSubmitting}
+                            autoFocus
+                          />
+                          <div className="reply-actions">
+                            <button
+                              type="button"
+                              className="cancel-btn"
+                              onClick={() => {
+                                setReplyingTo(null);
+                                setReplyText("");
+                              }}>
+                              Batal
+                            </button>
+                            <button
+                              type="submit"
+                              className="submit-btn"
+                              disabled={isSubmitting || !replyText.trim()}>
+                              <Send size={14} />
+                              {isSubmitting ? "Mengirim..." : "Kirim"}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    )}
+                  </div>
                 </div>
+
+                {/* Nested Replies */}
+                {comment.replies && comment.replies.length > 0 && (
+                  <div className="replies-container">
+                    {comment.replies.map((reply) => (
+                      <div
+                        key={reply.comment_id}
+                        className="comment-item reply-item">
+                        <div className="comment-avatar">
+                          {reply.user_avatar ? (
+                            <img
+                              src={`http://localhost:8080${reply.user_avatar}`}
+                              alt={reply.user_name}
+                            />
+                          ) : (
+                            <User size={28} />
+                          )}
+                        </div>
+
+                        <div className="comment-content">
+                          <div className="comment-header">
+                            <span className="comment-author">
+                              {reply.user_name}
+                            </span>
+                            <span className="comment-time">
+                              {formatDate(reply.created_at)}
+                            </span>
+                          </div>
+
+                          <p className="comment-text">{reply.comment_text}</p>
+
+                          {user && reply.user_id === user.user_id && (
+                            <button
+                              className="delete-btn"
+                              onClick={() =>
+                                handleDeleteComment(reply.comment_id)
+                              }>
+                              <Trash2 size={14} />
+                              Hapus
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))
           )}

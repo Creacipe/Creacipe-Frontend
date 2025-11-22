@@ -254,7 +254,15 @@ const RecipeDetailPage = () => {
   return (
     <div className="recipe-detail-container">
       {/* Tombol "Kembali" */}
-      <button onClick={() => navigate(-1)} className="back-button">
+      <button onClick={() => {
+        // Jika datang dari home, kembali ke home
+        // Jika tidak, gunakan navigate(-1) tapi skip jika sebelumnya adalah comments page
+        if (location.state?.from === "home") {
+          navigate("/");
+        } else {
+          navigate("/");
+        }
+      }} className="back-button">
         &lt;
       </button>
 
@@ -347,53 +355,53 @@ const RecipeDetailPage = () => {
         </div>
       )}
 
-      {/* Preview Komentar - Hide jika resep milik user sendiri */}
-      {!isOwnRecipe && (
-        <div className="comment-preview-section">
-          <div className="comment-header">
-            <h3>
-              <MessageCircle size={24} />
-              Komentar ({commentCount})
-            </h3>
-          </div>
+      {/* Preview Komentar - Tersedia untuk semua resep */}
+      <div className="comment-preview-section">
+        <div className="comment-header">
+          <h3>
+            <MessageCircle size={24} />
+            Komentar ({commentCount})
+          </h3>
+        </div>
 
           {comments.length === 0 ? (
-            <div className="no-comments">
-              <MessageCircle size={48} />
-              <p>Belum ada komentar</p>
-              <span>Jadilah yang pertama berkomentar!</span>
-            </div>
-          ) : (
-            <div className="comments-preview-list">
-              {comments.map((comment) => (
-                <div key={comment.comment_id} className="comment-preview-item">
-                  <div className="comment-avatar">
-                    {comment.user_avatar ? (
-                      <img
-                        src={`http://localhost:8080${comment.user_avatar}`}
-                        alt={comment.user_name}
-                      />
-                    ) : (
-                      <User size={24} />
-                    )}
-                  </div>
-                  <div className="comment-content">
-                    <strong>{comment.user_name}</strong>
-                    <p>{comment.comment_text}</p>
-                  </div>
+          <div className="no-comments">
+            <MessageCircle size={48} />
+            <p>Belum ada komentar</p>
+            <span>{isOwnRecipe ? "Jadilah yang pertama berkomentar di resep Anda!" : "Jadilah yang pertama berkomentar!"}</span>
+          </div>
+        ) : (
+          <div className="comments-preview-list">
+            {comments.map((comment) => (
+              <div key={comment.comment_id} className="comment-preview-item">
+                <div className="comment-avatar">
+                  {comment.user_avatar ? (
+                    <img
+                      src={`http://localhost:8080${comment.user_avatar}`}
+                      alt={comment.user_name}
+                    />
+                  ) : (
+                    <User size={24} />
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="comment-content">
+                  <strong>{comment.user_name}</strong>
+                  <p>{comment.comment_text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
           <Link to={`/menu/${id}/comments`} className="view-all-comments-btn">
-            <MessageCircle size={18} />
-            {commentCount > 0
-              ? "Lihat Semua Komentar & Beri Komentar"
+          <MessageCircle size={18} />
+          {commentCount > 0
+            ? "Lihat Semua Komentar & Beri Komentar"
+            : isOwnRecipe 
+              ? "Beri Komentar atau Tips Tambahan"
               : "Beri Komentar"}
           </Link>
         </div>
-      )}
 
       {/* BAGIAN REKOMENDASI */}
       {showRecommendations && recommendations.length > 0 && (

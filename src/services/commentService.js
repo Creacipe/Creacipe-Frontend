@@ -3,9 +3,10 @@ import api from "./api";
 
 export const commentService = {
   // Create comment on a menu
-  createComment: async (menuId, commentText) => {
+  createComment: async (menuId, commentText, parentId = null) => {
     return await api.post(`/menus/${menuId}/comments`, {
       comment_text: commentText,
+      parent_id: parentId,
     });
   },
 

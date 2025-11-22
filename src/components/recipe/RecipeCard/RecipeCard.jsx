@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { menuService } from "../../../services/menuService";
 import { useAuth } from "../../../context/AuthContext";
 import StatusBadge from "../../StatusBadge/StatusBadge";
+import { ThumbsUp, ThumbsDown, Bookmark, MoreVertical, Edit2, Trash2 } from "lucide-react";
 import "./RecipeCard.scss";
 
 const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark, showActions = false, onEdit, onDelete }) => {
@@ -216,14 +217,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
             className={`action-btn like-btn ${isLiked ? "active" : ""}`}
             onClick={handleLike}
             title="Like">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill={isLiked ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="2">
-              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-            </svg>
+            <ThumbsUp size={18} fill={isLiked ? "currentColor" : "none"} />
             <span>{likeCount}</span>
           </button>
 
@@ -231,14 +225,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
             className={`action-btn dislike-btn ${isDisliked ? "active" : ""}`}
             onClick={handleDislike}
             title="Dislike">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill={isDisliked ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="2">
-              <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-            </svg>
+            <ThumbsDown size={18} fill={isDisliked ? "currentColor" : "none"} />
             <span>{dislikeCount}</span>
           </button>
 
@@ -248,14 +235,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
             }`}
             onClick={handleBookmark}
             title="Bookmark">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill={isBookmarked ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
+            <Bookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
             <span>{bookmarkCount}</span>
           </button>
 
@@ -270,16 +250,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
                   setShowDropdown(!showDropdown);
                 }}
                 title="More">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2">
-                  <circle cx="12" cy="12" r="1"></circle>
-                  <circle cx="12" cy="5" r="1"></circle>
-                  <circle cx="12" cy="19" r="1"></circle>
-                </svg>
+                <MoreVertical size={18} />
               </button>
 
               {showDropdown && (
@@ -292,15 +263,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
                       setShowDropdown(false);
                       if (onEdit) onEdit(menuId);
                     }}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
+                    <Edit2 size={16} />
                     <span>Edit</span>
                   </button>
 
@@ -312,17 +275,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
                       setShowDropdown(false);
                       if (onDelete) onDelete(menuId, title);
                     }}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
+                    <Trash2 size={16} />
                     <span>Hapus</span>
                   </button>
                 </div>
