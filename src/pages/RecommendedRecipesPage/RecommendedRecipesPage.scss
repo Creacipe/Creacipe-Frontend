@@ -1,0 +1,176 @@
+// Variables
+$primary-color: #667eea;
+$text-primary: #2d3748;
+$text-secondary: #718096;
+$danger-color: #e53e3e;
+
+.recommended-recipes-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: $primary-color;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: $text-secondary;
+    }
+  }
+
+  .back-button {
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #e9ecef;
+      border-color: $primary-color;
+      color: $primary-color;
+      transform: translateX(-5px);
+    }
+  }
+
+  .loading,
+  .error,
+  .no-data {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.1rem;
+    color: $text-secondary;
+  }
+
+  .error {
+    color: $danger-color;
+  }
+
+  .no-data {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 4rem 2rem;
+
+    p {
+      margin: 0.5rem 0;
+
+      &:first-child {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+  }
+
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+
+    /* Tablet */
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    padding: 1rem 0;
+
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      background: white;
+      color: $primary-color;
+      border: 2px solid $primary-color;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover:not(:disabled) {
+        background: $primary-color;
+        color: white;
+      }
+
+      &.active {
+        background: $primary-color;
+        color: white;
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+    }
+
+    .pagination-dots {
+      color: #a0aec0;
+      padding: 0 0.25rem;
+      user-select: none;
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .page-header {
+      margin-bottom: 2rem;
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+
+    .pagination {
+      gap: 0.3rem;
+
+      .pagination-btn {
+        min-width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

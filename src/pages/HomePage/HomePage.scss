@@ -21,23 +21,32 @@
 .popular-section,
 .recommended-section,
 .latest-section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 
   h2 {
     font-size: 1.8rem;
+    font-weight: 700;
+    color: #2d3748;
     margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid #667eea;
+    display: inline-block;
   }
 
   .loading,
   .error,
   .no-data {
     text-align: center;
-    padding: 2rem;
-    color: #666;
+    padding: 3rem 2rem;
+    color: #718096;
+    font-size: 1rem;
+    background: #f7fafc;
+    border-radius: 8px;
   }
 
   .error {
-    color: #e74c3c;
+    color: #e53e3e;
+    background: #fff5f5;
   }
 
   .view-more-container {
@@ -46,24 +55,27 @@
     margin-top: 2rem;
 
     .view-more-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      padding: 0.8rem 2rem;
-      font-size: 1rem;
+      background: transparent;
+      color: #667eea;
+      border: 2px solid #667eea;
+      padding: 0.7rem 1.8rem;
+      font-size: 0.95rem;
       font-weight: 600;
-      border-radius: 25px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        background: #667eea;
+        color: white;
+        transform: translateX(4px);
       }
 
       &:active {
-        transform: translateY(0);
+        transform: translateX(2px) scale(0.98);
       }
     }
   }
@@ -72,9 +84,23 @@
 /* Grid untuk menampilkan kartu resep */
 .recipe-grid {
   display: grid;
-  /* Grid 5 kolom di desktop, 1 di HP */
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, 1fr); /* 5 kolom di desktop */
   gap: 1.5rem;
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr); /* 3 kolom di tablet */
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr); /* 2 kolom di mobile */
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; /* 1 kolom di HP kecil */
+  }
 }
 
 .about-section {

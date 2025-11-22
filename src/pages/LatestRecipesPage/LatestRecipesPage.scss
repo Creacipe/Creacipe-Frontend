@@ -1,0 +1,132 @@
+.latest-recipes-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .back-button {
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    &:hover {
+      background-color: #e9ecef;
+      border-color: #667eea;
+      color: #667eea;
+      transform: translateX(-5px);
+    }
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    h1 {
+      font-size: 2.2rem;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 1.1rem;
+      color: #718096;
+    }
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f4f6fb;
+    border-radius: 8px;
+    padding: 0.75rem 1.2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 1rem;
+      flex: 1;
+      color: #2d3748;
+    }
+    svg {
+      color: #667eea;
+    }
+  }
+
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    min-height: 200px;
+  }
+
+  .loading,
+  .error,
+  .no-data {
+    text-align: center;
+    padding: 3rem 0;
+    font-size: 1.1rem;
+    color: #718096;
+    grid-column: 1/-1;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    padding: 1rem 0;
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      &:hover:not(:disabled) {
+        background: #667eea;
+        color: white;
+      }
+      &.active {
+        background: #667eea;
+        color: white;
+      }
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      &:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+    }
+    .pagination-dots {
+      color: #a0aec0;
+      padding: 0 0.25rem;
+      user-select: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .recipes-grid {
+      grid-template-columns: 1fr;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+}

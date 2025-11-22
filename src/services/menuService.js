@@ -104,6 +104,14 @@ const updateMenu = (id, formData) => {
 const deleteMenu = (id) => {
   return api.delete(`/menus/${id}`);
 };
+
+/**
+ * Mendapatkan rekomendasi personalisasi berdasarkan resep yang di-like user.
+ * Endpoint: GET /api/recommendations/profile
+ */
+const getPersonalizedRecommendations = () => {
+  return api.get("/me/recommendations");
+};
 // ---------------------------------
 // --- PERBARUI EKSPOR DI BAGIAN BAWAH ---
 export const menuService = {
@@ -122,4 +130,5 @@ export const menuService = {
   getMyCollection,      // Tambahkan
   updateMenu,      // Tambahkan
   deleteMenu,       // Tambahkan
+  getPersonalizedRecommendations, // Tambahkan
 };
