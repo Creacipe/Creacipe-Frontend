@@ -1,0 +1,216 @@
+/* LOKASI: src/pages/PopularRecipesPage/PopularRecipesPage.scss */
+
+// Variables
+$primary-color: #667eea;
+$text-primary: #2d3748;
+$text-secondary: #718096;
+$danger-color: #e53e3e;
+
+.popular-recipes-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: $primary-color;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: $text-secondary;
+    }
+  }
+
+  .loading,
+  .error,
+  .no-data {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.1rem;
+    color: $text-secondary;
+  }
+
+  .error {
+    color: $danger-color;
+  }
+
+  .popular-recipes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .popular-recipe-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .ranking-badge {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-right: 1.5rem;
+
+      &.badge-1 {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+
+        .medal {
+          font-size: 2rem;
+        }
+      }
+
+      &.badge-2 {
+        background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+        box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+
+        .medal {
+          font-size: 2rem;
+        }
+      }
+
+      &.badge-3 {
+        background: linear-gradient(135deg, #cd7f32, #e6a85c);
+        box-shadow: 0 4px 12px rgba(205, 127, 50, 0.4);
+
+        .medal {
+          font-size: 2rem;
+        }
+      }
+
+      &.badge-default {
+        background: linear-gradient(135deg, #6c757d, #868e96);
+        color: white;
+
+        .number {
+          font-size: 1.2rem;
+        }
+      }
+    }
+
+    .recipe-image {
+      flex-shrink: 0;
+      width: 150px;
+      height: 150px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-right: 1.5rem;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .recipe-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .recipe-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+      }
+
+      .recipe-description {
+        color: $text-secondary;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .recipe-stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          color: $text-secondary;
+          font-size: 0.9rem;
+
+          svg {
+            color: $primary-color;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .page-header {
+      margin-bottom: 2rem;
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+
+    .popular-recipe-item {
+      flex-direction: column;
+      text-align: center;
+
+      .ranking-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        margin: 0;
+      }
+
+      .recipe-image {
+        width: 100%;
+        height: 200px;
+        margin: 0 0 1rem 0;
+      }
+
+      .recipe-info {
+        .recipe-title {
+          font-size: 1.3rem;
+        }
+
+        .recipe-stats {
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { menuService } from '../../services/menuService';
+import { useNavigate } from "react-router-dom";
 import RecipeCard from '../../components/recipe/RecipeCard/RecipeCard';
 import './HomePage.scss';
 
@@ -9,6 +10,8 @@ const HomePage = () => {
   const [popularMenus, setPopularMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  
 
   useEffect(() => {
     // Fungsi untuk mengambil data
@@ -17,7 +20,8 @@ const HomePage = () => {
         setLoading(true);
         setError(null); 
         const response = await menuService.getPopularMenus();
-        setPopularMenus(response.data.data); // Backend membungkusnya di 'data'
+        //limit ke 5 menu terpopuler
+        setPopularMenus(response.data.data.slice(0, 5)); // Backend membungkusnya di 'data'
       
       } catch (err) { 
         // Kita langsung ambil pesan error-nya untuk ditampilkan ke user.
@@ -64,6 +68,15 @@ const HomePage = () => {
       <section className="popular-section">
         <h2>Resep Populer</h2>
         {renderContent()}
+        {!loading && !error && popularMenus.length > 0 && (
+          <div className="view-more-container">
+            <button
+              className="view-more-btn"
+              onClick={() => navigate("/popular-recipes")}>
+              Lihat Lebih Banyak
+            </button>
+          </div>
+        )}
       </section>
 
       {/* (Sesuai Wireframe) Bagian "Tentang Kami" (Statis) */}

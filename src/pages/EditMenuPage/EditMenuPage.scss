@@ -1,7 +1,7 @@
 // LOKASI: src/pages/EditMenuPage/EditMenuPage.scss
 // Menggunakan styling yang sama dengan CreateMenuPage
 
-@import "../../css/shared-styles.scss";
+@use "../../css/shared-styles.scss";
 
 .edit-menu-container {
   max-width: 700px;
