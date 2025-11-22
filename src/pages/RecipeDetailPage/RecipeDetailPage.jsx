@@ -33,7 +33,6 @@ const safeParseJSON = (data) => {
 
 const RecipeDetailPage = () => {
   const { id } = useParams(); // Mengambil 'id' dari URL
-  const menuId = parseInt(id, 10); // Ubah ID jadi angka untuk perbandingan
   const navigate = useNavigate(); // Hook untuk tombol "Kembali"
   const location = useLocation(); // Untuk mendapatkan state dari navigasi
   const [menu, setMenu] = useState(null);
@@ -143,23 +142,41 @@ const RecipeDetailPage = () => {
     fetchComments();
   }, [id]);
 
-  // --- EFEK BARU: Mengatur status tombol saat user atau menu dimuat ---
-  useEffect(() => {
-    // Cek hanya jika user sudah login dan data user sudah ter-load
-    if (isLoggedIn && user && menu) {
-      // Cek status vote
-      const userVote = user.Votes?.find((v) => v.MenuID === menuId);
-      if (userVote) {
-        setVoteStatus(userVote.VoteType); // 1 atau -1
-      } else {
-        setVoteStatus(0);
-      }
-
-      // Cek status bookmark
-      const userBookmark = user.Bookmarks?.find((b) => b.MenuID === menuId);
-      setIsBookmarked(!!userBookmark); // true atau false
+   useEffect(() => {
+    // Hanya fetch jika user sudah login
+    if (!isLoggedIn || !user) {
+      // Reset ke default jika belum login
+      setVoteStatus(0);
+      setIsBookmarked(false);
+      return;
     }
-  }, [user, menu, isLoggedIn, menuId]);
+
+    const fetchInteractionStatus = async () => {
+      try {
+        const response = await menuService.getUserInteractionStatus(id);
+        const { is_liked, is_disliked, is_bookmarked } = response.data;
+
+        // Set vote status: 1 jika like, -1 jika dislike, 0 jika tidak ada
+        if (is_liked) {
+          setVoteStatus(1);
+        } else if (is_disliked) {
+          setVoteStatus(-1);
+        } else {
+          setVoteStatus(0);
+        }
+
+        // Set bookmark status
+        setIsBookmarked(is_bookmarked);
+      } catch (err) {
+        console.error("Gagal mengambil status interaksi:", err);
+        // Jika error (misal belum pernah interaksi), set ke default
+        setVoteStatus(0);
+        setIsBookmarked(false);
+      }
+    };
+
+    fetchInteractionStatus();
+  }, [id, isLoggedIn, user]);
   // -----------------------------------------------------------------
 
   // --- HANDLER BARU (TANPA ALERT) ---
@@ -308,7 +325,7 @@ const RecipeDetailPage = () => {
             className={`action-button ${
               voteStatus === 1 ? "active-like" : ""
             }`}>
-            <ThumbsUp size={20} />
+            <ThumbsUp size={20} fill={voteStatus === 1 ? "currentColor" : "none"} />
             <span>{likeCount}</span>
           </button>
           <button
@@ -316,7 +333,7 @@ const RecipeDetailPage = () => {
             className={`action-button ${
               voteStatus === -1 ? "active-dislike" : ""
             }`}>
-            <ThumbsDown size={20} />
+            <ThumbsDown size={20} fill={voteStatus === -1 ? "currentColor" : "none"} />
             <span>{dislikeCount}</span>
           </button>
           <button
