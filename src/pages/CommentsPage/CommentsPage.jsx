@@ -108,45 +108,34 @@ const CommentsPage = () => {
   const handleDeleteComment = async () => {
   if (!commentToDelete) return;
 
-  console.log("Deleting comment with ID:", commentToDelete);
-  
-  
   try {
     // Make the API call
-    const response = await commentService.deleteComment(commentToDelete);
-    console.log("Delete response:", response);
+    await commentService.deleteComment(commentToDelete);
+    await fetchMenuAndComments();
     
-    // If successful, update the UI by filtering out the deleted comment
-    setComments(prevComments => {
-      // Filter out the deleted comment from the main comments
-      const updatedComments = prevComments.filter(
-        comment => comment.comment_id !== commentToDelete
-      );
-      
-      // Also filter out from any replies
-      return updatedComments.map(comment => ({
-        ...comment,
-        replies: (comment.replies || []).filter(
-          reply => reply.comment_id !== commentToDelete
-        )
-      }));
-    });
-
-    // Show success message
     setToast({
       type: "success",
       message: "Komentar berhasil dihapus"
     });
   } catch (err) {
     console.error("Error deleting comment:", err);
+    console.error("Error response:", err.response);
+    
+    let errorMessage = "Gagal menghapus komentar";
+    if (err.response) {
+      // If we got a response from the server, use its error message
+      errorMessage = err.response.data?.error || errorMessage;
+      console.error("Server response data:", err.response.data);
+    }
+    
     setToast({
       type: "error",
-      message: err.response?.data?.error || "Gagal menghapus komentar"
+      message: errorMessage
     });
   } finally {
     setShowDeleteConfirm(false);
     setCommentToDelete(null);
-  }
+    }
   };
  
   const formatDate = (dateString) => {
