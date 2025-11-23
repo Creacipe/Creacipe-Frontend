@@ -12,6 +12,7 @@ import {
 import { commentService } from "../../services/commentService";
 import { menuService } from "../../services/menuService";
 import { useAuth } from "../../context/AuthContext";
+import Toast from "../../components/ui/Toast/Toast";
 import "./CommentsPage.scss";
 
 const CommentsPage = () => {
@@ -27,6 +28,9 @@ const CommentsPage = () => {
   const [error, setError] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null); // { commentId, userName }
   const [replyText, setReplyText] = useState("");
+  const [toast, setToast] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
 
   // Fetch menu info dan comments
   const fetchMenuAndComments = useCallback(async () => {
@@ -101,18 +105,50 @@ const CommentsPage = () => {
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Hapus komentar ini?")) return;
+  const handleDeleteComment = async () => {
+  if (!commentToDelete) return;
 
-    try {
-      await commentService.deleteComment(commentId);
-      await fetchMenuAndComments();
-    } catch (err) {
-      console.error("Error deleting comment:", err);
-      alert("Gagal menghapus komentar");
-    }
+  console.log("Deleting comment with ID:", commentToDelete);
+  
+  
+  try {
+    // Make the API call
+    const response = await commentService.deleteComment(commentToDelete);
+    console.log("Delete response:", response);
+    
+    // If successful, update the UI by filtering out the deleted comment
+    setComments(prevComments => {
+      // Filter out the deleted comment from the main comments
+      const updatedComments = prevComments.filter(
+        comment => comment.comment_id !== commentToDelete
+      );
+      
+      // Also filter out from any replies
+      return updatedComments.map(comment => ({
+        ...comment,
+        replies: (comment.replies || []).filter(
+          reply => reply.comment_id !== commentToDelete
+        )
+      }));
+    });
+
+    // Show success message
+    setToast({
+      type: "success",
+      message: "Komentar berhasil dihapus"
+    });
+  } catch (err) {
+    console.error("Error deleting comment:", err);
+    setToast({
+      type: "error",
+      message: err.response?.data?.error || "Gagal menghapus komentar"
+    });
+  } finally {
+    setShowDeleteConfirm(false);
+    setCommentToDelete(null);
+  }
   };
-
+ 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -273,9 +309,11 @@ const CommentsPage = () => {
                       {user && comment.user_id === user.user_id && (
                         <button
                           className="delete-btn"
-                          onClick={() =>
-                            handleDeleteComment(comment.comment_id)
-                          }>
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCommentToDelete(comment.comment_id);
+                            setShowDeleteConfirm(true);
+                          }}>
                           <Trash2 size={14} />
                           Hapus
                         </button>
@@ -370,9 +408,11 @@ const CommentsPage = () => {
                           {user && reply.user_id === user.user_id && (
                             <button
                               className="delete-btn"
-                              onClick={() =>
-                                handleDeleteComment(reply.comment_id)
-                              }>
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCommentToDelete(reply.comment_id);
+                                setShowDeleteConfirm(true);
+                              }}>
                               <Trash2 size={14} />
                               Hapus
                             </button>
@@ -387,6 +427,40 @@ const CommentsPage = () => {
           )}
         </div>
       </div>
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+      <div className="modal-overlay">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <h3>Konfirmasi Hapus</h3>
+            <p>Apakah Anda yakin ingin menghapus komentar ini?</p>
+            <div className="modal-actions">
+              <button 
+                className="btn-cancel"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setCommentToDelete(null);
+                }}>
+                Batal
+              </button>
+              <button 
+                className="btn-confirm"
+                onClick={handleDeleteComment}>
+                Hapus
+              </button>
+            </div>
+          </div>
+       </div>
+      </div>
+      )}
+
+      {toast && (
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast(null)}
+      />
+      )}
     </div>
   );
 };
