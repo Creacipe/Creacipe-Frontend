@@ -1,17 +1,19 @@
 // LOKASI: src/pages/LoginPage/LoginPage.jsx (VERSI DIPERBARUI)
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { userService } from "../../services/userService";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import "./LoginPage.scss";
 
 const LoginPage = () => {
   const [activeTab, setActiveTab] = useState("login");
   const navigate = useNavigate();
   const { login, isLoggedIn, user } = useAuth();
-
+  const recaptchaRef = useRef(null);
+  const [captchaToken, setCaptchaToken] = useState(null); // 3. State token reCAPTCHA
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -38,13 +40,26 @@ const LoginPage = () => {
     setError(null);
   };
 
+  // 4. Handler saat Captcha dicentang
+  const onCaptchaChange = (token) => {
+    setCaptchaToken(token);
+    setError(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    // 5. Validasi di frontend: Captcha wajib diisi
+    if (!captchaToken) {
+        setError("Silakan centang 'Saya bukan robot' terlebih dahulu.");
+        return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login(loginData);
+      await login({ ...loginData, recaptcha_token: captchaToken });
       const profileResponse = await userService.getMyProfile();
       const userData = profileResponse.data.data;
       const roleId = userData?.Role?.role_id || userData?.Role?.RoleID;
@@ -58,6 +73,12 @@ const LoginPage = () => {
       const errorMessage =
         err.response?.data?.error || "Email atau password salah.";
       setError(errorMessage);
+
+      // 7. Reset Captcha jika login gagal (Wajib, karena token cuma 1x pakai)
+      setCaptchaToken(null);
+      if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+      }
       setIsLoading(false);
     }
   };
@@ -138,8 +159,15 @@ const LoginPage = () => {
                 </div>
               </div>
 
+              {/* 8. Tambahkan Komponen ReCAPTCHA DISINI */}
+              <div className="form-group captcha-container">
+                <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                    onChange={onCaptchaChange}
+                />
+              </div>
               {error && <div className="alert alert-error">{error}</div>}
-
               <button
                 type="submit"
                 className="btn-submit"

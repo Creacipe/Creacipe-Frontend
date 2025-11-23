@@ -216,6 +216,19 @@
       }
     }
   }
+
+  // Captcha Container Styling
+  .captcha-container {
+  display: flex;
+  justify-content: center; // Supaya captcha ada di tengah
+  margin-bottom: 1.5rem;
+  transform: scale(0.9); // Opsional: perkecil sedikit jika layout sempit
+  transform-origin: center;
+  
+  @media (min-width: 400px) {
+      transform: scale(1);
+    }
+  }
 }
 
 // Responsive
