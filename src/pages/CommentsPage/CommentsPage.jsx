@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   User,
   Reply,
+  X,
 } from "lucide-react";
 import { commentService } from "../../services/commentService";
 import { menuService } from "../../services/menuService";
@@ -26,7 +27,7 @@ const CommentsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [replyingTo, setReplyingTo] = useState(null); // { commentId, userName }
+  const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [toast, setToast] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -70,7 +71,6 @@ const CommentsPage = () => {
       await commentService.createComment(id, newComment, null);
       setNewComment("");
       await fetchMenuAndComments();
-
       // Trigger refresh badge
       window.dispatchEvent(new Event("notification-read"));
     } catch (err) {
@@ -86,20 +86,20 @@ const CommentsPage = () => {
     if (!replyText.trim()) {
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       await commentService.createComment(id, replyText, replyingTo.commentId);
       setReplyText("");
       setReplyingTo(null);
       await fetchMenuAndComments();
-
       // Trigger refresh badge
       window.dispatchEvent(new Event("notification-read"));
     } catch (err) {
       const errorMsg = err.response?.data?.error || "Gagal mengirim balasan";
-      alert(errorMsg);
+      setToast({
+      type: "error",
+      message: errorMsg
+    });
     } finally {
       setIsSubmitting(false);
     }
@@ -109,7 +109,6 @@ const CommentsPage = () => {
   if (!commentToDelete) return;
 
   try {
-    // Make the API call
     await commentService.deleteComment(commentToDelete);
     await fetchMenuAndComments();
     
@@ -123,11 +122,9 @@ const CommentsPage = () => {
     
     let errorMessage = "Gagal menghapus komentar";
     if (err.response) {
-      // If we got a response from the server, use its error message
       errorMessage = err.response.data?.error || errorMessage;
       console.error("Server response data:", err.response.data);
     }
-    
     setToast({
       type: "error",
       message: errorMessage
@@ -316,6 +313,7 @@ const CommentsPage = () => {
                             setReplyingTo({
                               commentId: comment.comment_id,
                               userName: comment.user_name,
+                              rootId: comment.comment_id
                             });
                             setReplyText("");
                           }}>
@@ -326,10 +324,16 @@ const CommentsPage = () => {
                     </div>
 
                     {/* Reply Form */}
-                    {replyingTo?.commentId === comment.comment_id && (
+                    {replyingTo?.rootId === comment.comment_id &&(
                       <form onSubmit={handleSubmitReply} className="reply-form">
                         <div className="reply-to-info">
-                          Membalas <strong>@{replyingTo.userName}</strong>
+                          Membalas <strong> @{replyingTo.userName}</strong>
+                          <button
+                            type="button"
+                            className="close-reply"
+                            onClick={() => setReplyingTo(null)}>
+                            <X size={14} />
+                          </button>
                         </div>
                         <div className="reply-input-group">
                           <textarea
@@ -404,6 +408,21 @@ const CommentsPage = () => {
                               }}>
                               <Trash2 size={14} />
                               Hapus
+                            </button>
+                          )}
+                          {user && (
+                            <button
+                            className="reply-btn"
+                            onClick={() => {
+                              setReplyingTo({
+                                commentId: reply.comment_id,
+                                userName: reply.user_name,
+                                rootId: comment.comment_id
+                              });
+                              setReplyText("");
+                            }}>
+                              <Reply size={14} />
+                              Balas
                             </button>
                           )}
                         </div>
