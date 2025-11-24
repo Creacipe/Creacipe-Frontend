@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../services/authService";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import "./RegisterPage.scss";
 
 const RegisterPage = () => {
   const [activeTab, setActiveTab] = useState("register");
   const navigate = useNavigate();
-
+  const recaptchaRef = useRef(null);
   const [registerData, setRegisterData] = useState({
     name: "",
     email: "",
     password: "",
   });
+  const [captchaToken, setCaptchaToken] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -24,19 +26,36 @@ const RegisterPage = () => {
     setError(null);
     setSuccess(null);
   };
+  // 4. Handler Captcha
+  const onCaptchaChange = (token) => {
+    setCaptchaToken(token);
+    setError(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    // 5. Validasi Frontend
+    if (!captchaToken) {
+      setError("Silakan centang 'Saya bukan robot' terlebih dahulu.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await authService.register(registerData);
+      const response = await authService.register({...registerData, recaptcha_token: captchaToken,});
       setSuccess(
         response.data.message || "Registrasi berhasil! Silakan login."
       );
       setRegisterData({ name: "", email: "", password: "" });
+
+      // Reset Captcha setelah sukses
+      setCaptchaToken(null);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
 
       setTimeout(() => {
         navigate("/login");
@@ -45,6 +64,11 @@ const RegisterPage = () => {
       const errorMessage =
         err.response?.data?.error || "Registrasi gagal. Coba lagi.";
       setError(errorMessage);
+      // 7. Reset Captcha jika gagal
+      setCaptchaToken(null);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -145,6 +169,14 @@ const RegisterPage = () => {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+              </div>
+
+              <div className="form-group captcha-container">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  onChange={onCaptchaChange}
+                />
               </div>
 
               {error && <div className="alert alert-error">{error}</div>}
