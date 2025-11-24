@@ -13,6 +13,7 @@ import {
   Folder,
   ClipboardList,
   FileText,
+  ChartColumnBig,
 } from "lucide-react";
 import "./DashboardHomePage.scss";
 
@@ -194,6 +195,16 @@ const DashboardHomePage = () => {
                 </span>
                 <div>
                   <h4>Log Aktivitas</h4>
+                  <p>Lihat jejak aktivitas sistem</p>
+                </div>
+              </Link>
+
+              <Link to="/dashboard/reporting" className="action-card">
+                <span className="action-icon">
+                  <ChartColumnBig className="icon" />
+                </span>
+                <div>
+                  <h4>Reporting</h4>
                   <p>Lihat jejak aktivitas sistem</p>
                 </div>
               </Link>

@@ -158,7 +158,7 @@ const ReportingPage = () => {
       {/* Baris 1: Overview & Beban Kerja */}
       <div className="report-row">
         <div className="report-card pie-chart-card">
-          <h3>Status Moderasi Resep</h3>
+          <h3>Status Resep</h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -182,7 +182,7 @@ const ReportingPage = () => {
           </ResponsiveContainer>
         </div>
         <div className="report-card area-chart-card">
-          <h3>Aktivitas Harian (30 Hari)</h3>
+          <h3>Aktivitas Harian</h3>
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={filterDataByDateRange(stats.activityStats)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
@@ -204,7 +204,7 @@ const ReportingPage = () => {
       {/* Baris 2: Tren & Pertumbuhan */}
       <div className="report-row">
         <div className="report-card line-chart-card">
-          <h3>Pertumbuhan Komunitas (30 Hari)</h3>
+          <h3>Pertumbuhan Website</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={filterDataByDateRange(stats.growthStats)} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -218,7 +218,7 @@ const ReportingPage = () => {
           </ResponsiveContainer>
         </div>
         <div className="report-card bar-chart-card">
-          <h3>Top 10 Kategori/Tag Populer</h3>
+          <h3>Top 10 Tag Populer</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stats.topTags} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -234,7 +234,7 @@ const ReportingPage = () => {
       {/* Baris 3: Leaderboard */}
       <div className="report-row">
          <div className="report-card">
-          <h3>Top 5 Resep Paling Disukai</h3>
+          <h3>Top 5 Resep Paling banyak Disukai</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stats.topLiked} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -246,7 +246,7 @@ const ReportingPage = () => {
           </ResponsiveContainer>
         </div>
          <div className="report-card">
-          <h3>Top 5 Resep Paling Disimpan</h3>
+          <h3>Top 5 Resep Paling banyak Disimpan</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stats.topBookmarked} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
