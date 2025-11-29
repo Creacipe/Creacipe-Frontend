@@ -16,6 +16,7 @@ import RecipeDetailPage from "../pages/RecipeDetailPage/RecipeDetailPage";
 import PopularRecipesPage from "../pages/PopularRecipesPage/PopularRecipesPage";
 import RecommendedRecipesPage from "../pages/RecommendedRecipesPage/RecommendedRecipesPage";
 import LatestRecipesPage from "../pages/LatestRecipesPage/LatestRecipesPage";
+import SearchResultsPage from "../pages/SearchResultsPage/SearchResultsPage";
 
 
 // User Pages
@@ -50,6 +51,7 @@ const AppRouter = () => {
         {/* Public Routes */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/popular-recipes" element={<PopularRecipesPage />} />
           <Route path="/recommended-recipes" element={<RecommendedRecipesPage />} />
           <Route path="/latest-recipes" element={<LatestRecipesPage />} />

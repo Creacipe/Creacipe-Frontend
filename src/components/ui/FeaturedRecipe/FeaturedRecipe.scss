@@ -1,0 +1,133 @@
+$primary-color: #FF6B6B; 
+$text-dark: #333333;
+$text-muted: #777777;
+
+.featured-recipe-container {
+  display: flex;
+  width: 100%;
+  min-height: 450px; // Tinggi disesuaikan sedikit
+  background-color: #fff;
+  overflow: hidden;
+  // Border radius opsional jika ingin sudut tumpul
+  // border-radius: 12px; 
+  // box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+  
+  .featured-image {
+    flex: 1.2; 
+    position: relative;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.03);
+    }
+  }
+
+  .featured-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    background-color: #ffffff;
+
+    .content-wrapper {
+      max-width: 450px;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: $text-muted;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .title-link {
+      text-decoration: none;
+      color: $text-dark;
+      
+      // --- PERBAIKAN JUDUL (Tanpa Underline Merah) ---
+      .featured-title {
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0; // Jarak ke bawah dikurangi sedikit
+        line-height: 1.2;
+        font-weight: 700;
+        transition: color 0.3s ease;
+      }
+
+      &:hover .featured-title {
+        color: $primary-color; // Hanya berubah warna saat hover
+      }
+    }
+
+    .featured-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+
+      .author {
+        font-size: 1rem;
+        color: $text-muted;
+        margin: 0;
+
+        strong {
+          color: $text-dark; // Warna Nama (Hitam/Gelap)
+          font-weight: 600;
+        }
+
+        .author-name {
+          color: $text-dark; // Nama user lebih gelap
+          font-weight: 600;
+        }
+      }
+
+      .likes-count {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        color: $text-dark;
+        font-weight: 500;
+        margin-top: 0.5rem;
+
+        // Style icon ThumbsUp
+        .like-icon {
+          fill: transparent; // Kosong tengahnya (outline)
+          stroke: $text-dark; // Garis pinggir hitam/abu tua
+          stroke-width: 2px;
+        }
+      }
+    }
+  }
+}
+
+// --- RESPONSIVE ---
+@media (max-width: 768px) {
+  .featured-recipe-container {
+    flex-direction: column;
+    
+    .featured-image {
+      width: 100%;
+      height: 250px;
+    }
+
+    .featured-content {
+      padding: 2rem 1.5rem;
+      
+      .title-link .featured-title {
+        font-size: 1.8rem;
+      }
+    }
+  }
+}

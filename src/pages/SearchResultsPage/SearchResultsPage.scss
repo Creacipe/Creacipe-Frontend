@@ -1,0 +1,156 @@
+.search-results-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 80vh;
+
+  .search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+
+    h2 {
+      font-size: 1.8rem;
+      color: #333;
+      margin: 0;
+      font-weight: 700;
+    }
+  }
+
+  /* --- KOLOM SEARCH MINI --- */
+  .mini-search-bar {
+    display: flex;
+    align-items: center; /* KUNCI: Menengahkan anak secara vertikal */
+    justify-content: space-between; /* Input kiri, Tombol kanan */
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 50px; 
+    
+    width: 100%;
+    max-width: 400px;
+    height: 50px;
+    
+    padding: 0 0.5rem 0 1.2rem;
+    box-sizing: border-box;
+    
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: relative;
+
+    &:focus-within {
+      border-color: #667eea;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
+      transform: translateY(-1px);
+    }
+
+    input {
+      border: none !important;
+      background: transparent !important;
+      outline: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      appearance: none !important;
+      
+      flex: 1; 
+      width: 100%;
+      height: 100%; /* Input mengisi tinggi container */
+      
+      font-size: 1rem;
+      color: #333;
+      font-family: inherit;
+      padding: 0;
+      
+      /* Memastikan text di tengah input */
+      display: flex;
+      align-items: center; 
+
+      &::placeholder {
+        color: #aaa;
+        opacity: 1;
+      }
+    }
+
+    button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      
+      width: 40px; 
+      height: 40px;
+      border-radius: 50%;
+      
+      display: flex;
+      align-items: center; /* Icon di tengah vertikal tombol */
+      justify-content: center; /* Icon di tengah horizontal tombol */
+      color: #667eea;
+      
+      flex-shrink: 0; 
+      transition: background 0.2s, transform 0.1s;
+
+      /* HAPUS TRANSFORM MANUAL (-2px) AGAR KEMBALI KE CENTER ASLI */
+      transform: none; 
+
+      &:hover {
+        background-color: #f0f2ff;
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+
+  .search-info {
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    
+    strong {
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 4rem 0;
+    color: #888;
+    font-style: italic;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: #f9f9f9;
+    border-radius: 16px;
+    border: 1px dashed #ddd;
+
+    .illustration {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+
+    h3 { 
+      color: #333; 
+      margin-bottom: 0.5rem; 
+      font-size: 1.2rem;
+    }
+    p { color: #777; }
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1200px) { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 900px) { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 600px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 400px) { grid-template-columns: 1fr; }
+  }
+}

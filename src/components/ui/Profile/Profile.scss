@@ -6,7 +6,7 @@
 }
 
 .dropdown-toggle {
-  background-color: #007bff;
+  background-color: #667eea;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -16,6 +16,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+      background-color: #2e3867;
+    }
 
   span {
     font-size: 0.7rem;

@@ -1,14 +1,20 @@
+/* LOKASI: src/layouts/DashboardLayout.scss */
+
 // Variables
 $sidebar-width: 280px;
 $sidebar-collapsed-width: 80px;
-$sidebar-bg-start: #1e3a8a;
-$sidebar-bg-end: #1e40af;
+
+// --- UPDATE WARNA BRAND (GRADASI UNGU-BIRU) ---
+$sidebar-bg-start: #667eea; 
+$sidebar-bg-end: #764ba2;
+// ----------------------------------------------
+
 $text-white: #ffffff;
-$text-white-85: rgba(255, 255, 255, 0.85);
+$text-white-85: rgba(255, 255, 255, 0.9); // Sedikit lebih terang
 $text-white-75: rgba(255, 255, 255, 0.75);
 $text-white-70: rgba(255, 255, 255, 0.7);
-$border-color: rgba(255, 255, 255, 0.1);
-$active-border: #60a5fa;
+$border-color: rgba(255, 255, 255, 0.15); // Border lebih terlihat sedikit
+$active-border: #ffffff; // Border aktif jadi putih agar kontras
 $overlay-bg: rgba(0, 0, 0, 0.5);
 
 // Breakpoints
@@ -19,7 +25,8 @@ $tablet: 1024px;
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: #f3f4f6; // Abu muda yang lebih bersih
+  font-family: 'Inter', sans-serif;
 }
 
 // Overlay
@@ -45,10 +52,14 @@ $tablet: 1024px;
   left: 0;
   bottom: 0;
   height: 100vh;
-  background: linear-gradient(to bottom, $sidebar-bg-start, $sidebar-bg-end);
+  
+  // --- UPDATE GRADIENT DIAGONAL ---
+  background: linear-gradient(135deg, $sidebar-bg-start 0%, $sidebar-bg-end 100%);
+  // --------------------------------
+  
   color: $text-white;
   transition: all 300ms ease-in-out;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 0 25px rgba(102, 126, 234, 0.15); // Shadow ungu halus
   z-index: 1000;
   width: $sidebar-width;
   overflow: hidden;
@@ -68,6 +79,32 @@ $tablet: 1024px;
 
     &.collapsed {
       width: $sidebar-collapsed-width;
+      
+      .brand, .nav-text, .user-details, .logout-btn span, .chevron {
+        display: none; // Sembunyikan elemen teks
+        opacity: 0;
+      }
+      
+      .sidebar-header {
+        justify-content: center;
+        padding: 1.5rem 0;
+        
+        .collapse-btn {
+           margin: 0;
+        }
+      }
+      
+      .user-info {
+        justify-content: center;
+        padding: 0;
+      }
+      
+      .nav-button, .nav-link {
+        justify-content: center;
+        padding: 0.75rem;
+        
+        .icon-wrapper { margin: 0; }
+      }
     }
   }
 
@@ -81,53 +118,30 @@ $tablet: 1024px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem;
+    padding: 1.5rem 2rem;
     border-bottom: 1px solid $border-color;
 
     .brand {
-      font-weight: bold;
+      font-weight: 800;
       font-size: 1.5rem;
-      letter-spacing: 0.05em;
+      letter-spacing: 1px;
       transition: all 300ms;
       margin: 0;
+      text-transform: uppercase;
     }
 
-    .close-btn {
+    .close-btn, .collapse-btn {
       height: 2rem;
       width: 2rem;
       background-color: rgba(255, 255, 255, 0.15);
       color: $text-white;
       border: none;
-      border-radius: 0.375rem;
+      border-radius: 8px;
       cursor: pointer;
       transition: background-color 150ms;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.25);
-      }
-
-      .close-icon {
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-    }
-
-    .collapse-btn {
-      height: 2rem;
-      width: 2rem;
-      background-color: rgba(255, 255, 255, 0.15);
-      color: $text-white;
-      border: none;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      transition: background-color 150ms;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
 
       &:hover {
         background-color: rgba(255, 255, 255, 0.25);
@@ -137,65 +151,51 @@ $tablet: 1024px;
 
   .sidebar-scroll {
     flex: 1;
-    padding: 1.5rem 0;
+    padding: 1.5rem 1rem; // Padding kiri-kanan ditambah
     overflow-y: auto;
 
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 3px;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-    }
+    &::-webkit-scrollbar { width: 0px; }
   }
 
   .sidebar-nav {
-    padding: 0 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 
     .nav-item {
-      margin-bottom: 0.25rem;
+      width: 100%;
     }
 
     .nav-button,
     .nav-link {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 0.75rem 1rem;
-      border-radius: 0.375rem;
-      color: $text-white-85;
+      padding: 0.85rem 1rem;
+      border-radius: 12px; // Sudut lebih bulat
+      color: $text-white-75;
       background: transparent;
       border: none;
       width: 100%;
       text-align: left;
       text-decoration: none;
       font-weight: 500;
-      font-size: 0.9375rem;
+      font-size: 0.95rem;
       cursor: pointer;
-      transition: all 150ms;
+      transition: all 200ms ease;
 
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
         color: $text-white;
-      }
-
-      &.centered {
-        justify-content: center;
+        transform: translateX(4px); // Efek geser dikit
       }
 
       &.active {
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.2); // Background transparan putih
         color: $text-white;
-        border-left: 4px solid $active-border;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Shadow halus
+        font-weight: 600;
+        backdrop-filter: blur(5px);
+        // Border left dihapus, diganti style tombol penuh
       }
 
       .icon-wrapper {
@@ -203,45 +203,51 @@ $tablet: 1024px;
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-right: 12px;
 
         .icon {
-          width: 1.5rem;
-          height: 1.5rem;
+          width: 1.25rem;
+          height: 1.25rem;
         }
       }
 
       .nav-text {
         flex: 1;
+        white-space: nowrap;
       }
 
       .chevron {
         width: 1rem;
         height: 1rem;
+        opacity: 0.7;
       }
     }
 
     .submenu {
-      margin-left: 0;
+      margin-left: 1rem;
       margin-top: 0.25rem;
+      padding-left: 1rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
 
       .submenu-link {
         display: block;
-        padding: 0.625rem 1rem 0.625rem 3rem;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        color: $text-white-75;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: $text-white-70;
         text-decoration: none;
         transition: all 150ms;
+        margin-bottom: 2px;
 
         &:hover {
-          background-color: rgba(255, 255, 255, 0.08);
           color: $text-white;
+          background-color: rgba(255, 255, 255, 0.05);
         }
 
         &.active {
-          background-color: rgba(255, 255, 255, 0.12);
           color: $text-white;
-          border-left: 3px solid $active-border;
+          background-color: rgba(255, 255, 255, 0.1);
+          font-weight: 600;
         }
       }
     }
@@ -249,35 +255,30 @@ $tablet: 1024px;
 
   .sidebar-footer {
     border-top: 1px solid $border-color;
-    padding: 1.25rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.1); // Footer sedikit lebih gelap
 
     .user-info {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      background-color: rgba(255, 255, 255, 0.08);
-      border-radius: 0.5rem;
-      margin-bottom: 0.75rem;
-
-      &.centered {
-        justify-content: center;
-      }
+      gap: 1rem;
+      margin-bottom: 1.5rem;
 
       .user-avatar {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        background-color: rgba(255, 255, 255, 0.1);
+        width: 2.8rem;
+        height: 2.8rem;
+        background-color: rgba(255, 255, 255, 0.2);
         border-radius: 50%;
         overflow: hidden;
         flex-shrink: 0;
+        border: 2px solid rgba(255,255,255,0.1);
 
         .avatar-icon {
-          width: 1.25rem;
-          height: 1.25rem;
+          width: 1.5rem;
+          height: 1.5rem;
         }
 
         .avatar-image {
@@ -293,18 +294,19 @@ $tablet: 1024px;
 
         .user-name {
           font-weight: 600;
-          font-size: 0.9375rem;
-          margin: 0 0 0.125rem 0;
+          font-size: 0.95rem;
+          margin: 0;
+          white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          white-space: nowrap;
         }
 
         .user-role {
-          font-size: 0.8125rem;
+          font-size: 0.75rem;
           color: $text-white-70;
-          text-transform: capitalize;
-          margin: 0;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-top: 2px;
         }
       }
     }
@@ -315,24 +317,24 @@ $tablet: 1024px;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 0.625rem 1rem;
-      background-color: rgba(127, 29, 29, 0.15);
-      border: 1px solid rgba(127, 29, 29, 0.3);
-      color: #fca5a5;
-      border-radius: 0.375rem;
-      font-weight: 500;
+      padding: 0.8rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: $text-white;
+      border-radius: 10px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 150ms;
+      transition: all 200ms;
 
       &:hover {
-        background-color: rgba(127, 29, 29, 0.25);
-        border-color: rgba(127, 29, 29, 0.5);
-        color: #fecaca;
+        background-color: #ef4444; // Merah saat hover
+        border-color: #ef4444;
+        color: white;
       }
 
       .logout-icon {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: 1.2rem;
+        height: 1.2rem;
       }
     }
   }
@@ -344,7 +346,7 @@ $tablet: 1024px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: all 300ms;
+  transition: all 300ms ease-in-out;
 
   @media (min-width: $tablet) {
     &.sidebar-expanded {
@@ -363,15 +365,16 @@ $tablet: 1024px;
   top: 0;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
-  padding: 1rem 1rem;
+  padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   z-index: 50;
 
   @media (min-width: $tablet) {
-    padding: 1.5rem 2rem;
+    padding: 1rem 2.5rem;
+    height: 70px;
   }
 
   .top-bar-left {
@@ -384,64 +387,36 @@ $tablet: 1024px;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 44px;
-    width: 44px;
-    min-width: 44px;
-    min-height: 44px;
-    background-color: #f3f4f6;
+    width: 40px;
+    height: 40px;
+    background: transparent;
     border: none;
-    border-radius: 0.5rem;
     cursor: pointer;
-    transition: all 200ms;
+    color: #4b5563;
 
-    &:hover {
-      background-color: #e5e7eb;
-    }
-
-    &:focus-visible {
-      outline: 2px solid #3b82f6;
-      outline-offset: 2px;
-    }
-
-    &.active {
-      transform: rotate(90deg);
-    }
-
-    .hamburger-icon {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
+    &:hover { color: #111827; }
   }
 
   .page-title {
     font-size: 1.25rem;
-    font-weight: bold;
-    color: #111827;
+    font-weight: 700;
+    color: #1f2937;
     margin: 0;
-
-    @media (min-width: $tablet) {
-      font-size: 1.75rem;
-    }
   }
 
   .back-home-link {
-    padding: 0.625rem 1rem;
+    padding: 0.6rem 1.2rem;
     background-color: #f3f4f6;
-    color: #374151;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    font-size: 0.875rem;
+    color: #4b5563;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
     text-decoration: none;
-    transition: background-color 200ms;
-    white-space: nowrap;
-
-    @media (min-width: $tablet) {
-      padding: 0.625rem 1.25rem;
-      font-size: 0.9375rem;
-    }
+    transition: all 200ms;
 
     &:hover {
       background-color: #e5e7eb;
+      color: #111827;
     }
   }
 }
@@ -449,14 +424,10 @@ $tablet: 1024px;
 // Main Content
 .main-content {
   flex: 1;
-  padding: 1rem;
+  padding: 1.5rem;
   overflow-y: auto;
 
-  @media (min-width: $mobile) {
-    padding: 1.5rem;
-  }
-
   @media (min-width: $tablet) {
-    padding: 2rem;
+    padding: 2.5rem;
   }
 }

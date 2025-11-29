@@ -1,8 +1,231 @@
 /* LOKASI: src/components/ui/Footer/Footer.scss */
-.footer-container {
-  padding: 1.5rem 2rem;
-  background-color: #333;
-  color: #aaa;
-  text-align: center;
-  margin-top: auto; /* Mendorong footer ke bagian bawah */
+
+// Variables
+$bg-cream: #FFFBF2; // Warna background cream khas Kitchen Stories
+$text-dark: #333333;
+$border-color: #E0D8CC; // Warna garis pemisah
+$btn-green: #115c48; // Hijau tua untuk tombol newsletter
+$accent-yellow: #FFD43B; // Untuk badge 'Baru'
+
+.kitchen-footer {
+  background-color: $bg-cream;
+  color: $text-dark;
+  padding: 4rem 2rem 2rem;
+  border-top: 1px solid $border-color;
+  font-family: 'Inter', sans-serif; // Sesuaikan font
+  margin-top: auto; // Agar footer selalu di bawah jika konten sedikit
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    // Membuat 4 kolom sama besar
+    grid-template-columns: repeat(4, 1fr);
+    // Masalah Border Vertikal: Kita pakai gap 0 dan border di tiap kolom
+    gap: 0; 
+  }
+
+  .footer-column {
+    padding: 0 2rem;
+    border-right: 1px solid $border-color; // Garis pemisah vertikal
+
+    // Hilangkan border di kolom terakhir
+    &:last-child {
+      border-right: none;
+    }
+
+    // Hilangkan padding kiri di kolom pertama
+    &:first-child {
+      padding-left: 0;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: $text-dark;
+    }
+
+    /* --- KOLOM 1: SOCIAL & NEWSLETTER --- */
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+
+      a {
+        color: #666;
+        transition: color 0.3s;
+        &:hover { color: $text-dark; }
+      }
+    }
+
+    .newsletter-section {
+      margin-bottom: 2rem;
+      p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+      
+      .newsletter-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        input {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          outline: none;
+          &:focus { border-color: $btn-green; }
+        }
+
+        button {
+          background-color: $btn-green;
+          color: white;
+          border: none;
+          padding: 10px;
+          border-radius: 4px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.3s;
+
+          &:hover {
+            background-color: darken($btn-green, 5%);
+          }
+        }
+      }
+    }
+
+    .app-download {
+      p { font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 600; }
+      .store-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .store-btn {
+          background: black;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
+          text-align: left;
+          font-size: 0.85rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          
+          &:hover { opacity: 0.8; }
+        }
+      }
+    }
+
+    /* --- LINKS STYLE --- */
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: 0.8rem;
+        
+        a {
+          text-decoration: none;
+          color: $text-dark;
+          font-size: 0.95rem;
+          transition: color 0.2s;
+
+          &:hover {
+            text-decoration: underline;
+          }
+
+          &.link-with-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+
+          .badge-new {
+            background-color: $accent-yellow;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+          }
+        }
+      }
+    }
+
+    /* --- LANGUAGE --- */
+    .language-switch {
+      margin-top: 2rem;
+      .lang-options {
+        display: flex;
+        gap: 10px;
+        font-size: 0.9rem;
+        
+        span {
+          cursor: pointer;
+          color: #888;
+          &.active {
+            color: $text-dark;
+            font-weight: 600;
+            text-decoration: underline;
+          }
+          &:hover { color: $text-dark; }
+        }
+      }
+    }
+  }
+
+  /* --- FOOTER BOTTOM --- */
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 4rem auto 0;
+    text-align: center;
+    
+    .made-with {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .legal-text {
+      font-size: 0.75rem;
+      color: #777;
+      line-height: 1.6;
+    }
+  }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+  .kitchen-footer .footer-content {
+    grid-template-columns: 1fr 1fr; // Tablet: 2 kolom
+    
+    .footer-column {
+      border-right: none; // Hapus border vertikal di tablet
+      border-bottom: 1px solid $border-color;
+      padding: 2rem 0;
+      
+      &:nth-last-child(-n+2) {
+         border-bottom: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .kitchen-footer .footer-content {
+    grid-template-columns: 1fr; // Mobile: 1 kolom
+    
+    .footer-column {
+      padding: 2rem 0;
+      border-bottom: 1px solid $border-color;
+      
+      &:last-child { border-bottom: none; }
+    }
+  }
 }
