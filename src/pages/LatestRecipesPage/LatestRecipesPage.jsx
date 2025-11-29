@@ -15,35 +15,66 @@ import RecipeCard from "../../components/recipe/RecipeCard/RecipeCard";
 
 const LatestRecipesPage = () => {
   const [recipes, setRecipes] = useState([]);
+  const [interactionMap, setInteractionMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const navigate = useNavigate();
-  useAuth();
+  const { user } = useAuth();
 
-  const recipesPerPage = 10;
+  const recipesPerPage = 8;
 
   useEffect(() => {
-    const fetchLatestRecipes = async () => {
+    const fetchInitialRecipes = async () => {
       try {
         setLoading(true);
         const response = await menuService.getAllMenus();
-        // Sort by created_at descending if not already sorted
-        const sorted = (response.data.data || []).sort(
+        const sortedRecipes = response.data.data.sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at)
         );
-        setRecipes(sorted);
-        setFilteredRecipes(sorted);
+        setRecipes(sortedRecipes);
+        setFilteredRecipes(sortedRecipes);
       } catch (err) {
-        setError(err.response?.data?.error || "Gagal mengambil resep terbaru.");
+        setError("Gagal memuat data resep terbaru.");
+        console.error("Error fetching initial recipes:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchLatestRecipes();
+
+    fetchInitialRecipes();
   }, []);
+
+  useEffect(() => {
+    if (!user || recipes.length === 0) return;
+
+    const fetchAllInteractions = async () => {
+      const newMap = {};
+      await Promise.all(
+        recipes.map(async (recipe) => {
+          try {
+            const res = await menuService.getUserInteractionStatus(recipe.menu_id);
+            newMap[recipe.menu_id] = {
+              liked: !!res.data.is_liked,
+              disliked: !!res.data.is_disliked,
+              bookmarked: !!res.data.is_bookmarked,
+            };
+          } catch {
+            newMap[recipe.menu_id] = {
+              liked: false,
+              disliked: false,
+              bookmarked: false,
+            };
+          }
+        })
+      );
+      setInteractionMap(newMap);
+    };
+
+    fetchAllInteractions();
+  }, [user, recipes]);
 
   useEffect(() => {
     // Mirip dengan halaman Semua Resep Editor: filter di client-side
@@ -114,6 +145,7 @@ const LatestRecipesPage = () => {
             <RecipeCard
               key={recipe.menu_id}
               menu={recipe}
+              interactions={interactionMap[recipe.menu_id]}
               sourceFrom="latest"
             />
           ))

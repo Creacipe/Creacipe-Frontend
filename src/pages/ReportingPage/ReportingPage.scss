@@ -1,0 +1,102 @@
+// src/pages/ReportingPage/ReportingPage.scss
+
+.reporting-page {
+  padding: 2rem;
+  background-color: #f4f7fa;
+
+  .page-header {
+    margin-bottom: 1rem;
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+    p {
+      font-size: 1rem;
+      color: #718096;
+    }
+  }
+
+  .report-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .report-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #2d3748;
+    }
+
+    .placeholder {
+      flex-grow: 1;
+      display: grid;
+      place-items: center;
+      color: #a0aec0;
+      font-style: italic;
+      border: 2px dashed #e2e8f0;
+      border-radius: 6px;
+      min-height: 250px; // Ensure card has a minimum height
+    }
+  }
+  
+  // Specific widths for cards
+  .pie-chart-card, .bar-chart-card {
+    flex-basis: 33.33%;
+  }
+
+  .area-chart-card, .line-chart-card {
+    flex-basis: 66.66%;
+  }
+}
+
+.loading-container, .error-container {
+  padding: 2rem;
+  text-align: center;
+}
+
+.report-filters {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+  .date-picker-container {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #4a5568;
+      margin-bottom: 0.5rem;
+    }
+
+    .date-picker-input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      width: 150px;
+      &:focus {
+        outline: none;
+        border-color: #4299e1;
+        box-shadow: 0 0 0 1px #4299e1;
+      }
+    }
+  }
+}

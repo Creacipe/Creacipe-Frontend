@@ -8,10 +8,12 @@ import {
   ArrowLeft,
   User,
   Reply,
+  X,
 } from "lucide-react";
 import { commentService } from "../../services/commentService";
 import { menuService } from "../../services/menuService";
 import { useAuth } from "../../context/AuthContext";
+import Toast from "../../components/ui/Toast/Toast";
 import "./CommentsPage.scss";
 
 const CommentsPage = () => {
@@ -25,8 +27,11 @@ const CommentsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [replyingTo, setReplyingTo] = useState(null); // { commentId, userName }
+  const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [toast, setToast] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
 
   // Fetch menu info dan comments
   const fetchMenuAndComments = useCallback(async () => {
@@ -66,7 +71,6 @@ const CommentsPage = () => {
       await commentService.createComment(id, newComment, null);
       setNewComment("");
       await fetchMenuAndComments();
-
       // Trigger refresh badge
       window.dispatchEvent(new Event("notification-read"));
     } catch (err) {
@@ -82,37 +86,55 @@ const CommentsPage = () => {
     if (!replyText.trim()) {
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       await commentService.createComment(id, replyText, replyingTo.commentId);
       setReplyText("");
       setReplyingTo(null);
       await fetchMenuAndComments();
-
       // Trigger refresh badge
       window.dispatchEvent(new Event("notification-read"));
     } catch (err) {
       const errorMsg = err.response?.data?.error || "Gagal mengirim balasan";
-      alert(errorMsg);
+      setToast({
+      type: "error",
+      message: errorMsg
+    });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Hapus komentar ini?")) return;
+  const handleDeleteComment = async () => {
+  if (!commentToDelete) return;
 
-    try {
-      await commentService.deleteComment(commentId);
-      await fetchMenuAndComments();
-    } catch (err) {
-      console.error("Error deleting comment:", err);
-      alert("Gagal menghapus komentar");
+  try {
+    await commentService.deleteComment(commentToDelete);
+    await fetchMenuAndComments();
+    
+    setToast({
+      type: "success",
+      message: "Komentar berhasil dihapus"
+    });
+  } catch (err) {
+    console.error("Error deleting comment:", err);
+    console.error("Error response:", err.response);
+    
+    let errorMessage = "Gagal menghapus komentar";
+    if (err.response) {
+      errorMessage = err.response.data?.error || errorMessage;
+      console.error("Server response data:", err.response.data);
+    }
+    setToast({
+      type: "error",
+      message: errorMessage
+    });
+  } finally {
+    setShowDeleteConfirm(false);
+    setCommentToDelete(null);
     }
   };
-
+ 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -273,9 +295,11 @@ const CommentsPage = () => {
                       {user && comment.user_id === user.user_id && (
                         <button
                           className="delete-btn"
-                          onClick={() =>
-                            handleDeleteComment(comment.comment_id)
-                          }>
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCommentToDelete(comment.comment_id);
+                            setShowDeleteConfirm(true);
+                          }}>
                           <Trash2 size={14} />
                           Hapus
                         </button>
@@ -289,6 +313,7 @@ const CommentsPage = () => {
                             setReplyingTo({
                               commentId: comment.comment_id,
                               userName: comment.user_name,
+                              rootId: comment.comment_id
                             });
                             setReplyText("");
                           }}>
@@ -299,10 +324,16 @@ const CommentsPage = () => {
                     </div>
 
                     {/* Reply Form */}
-                    {replyingTo?.commentId === comment.comment_id && (
+                    {replyingTo?.rootId === comment.comment_id &&(
                       <form onSubmit={handleSubmitReply} className="reply-form">
                         <div className="reply-to-info">
-                          Membalas <strong>@{replyingTo.userName}</strong>
+                          Membalas <strong> @{replyingTo.userName}</strong>
+                          <button
+                            type="button"
+                            className="close-reply"
+                            onClick={() => setReplyingTo(null)}>
+                            <X size={14} />
+                          </button>
                         </div>
                         <div className="reply-input-group">
                           <textarea
@@ -370,11 +401,28 @@ const CommentsPage = () => {
                           {user && reply.user_id === user.user_id && (
                             <button
                               className="delete-btn"
-                              onClick={() =>
-                                handleDeleteComment(reply.comment_id)
-                              }>
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCommentToDelete(reply.comment_id);
+                                setShowDeleteConfirm(true);
+                              }}>
                               <Trash2 size={14} />
                               Hapus
+                            </button>
+                          )}
+                          {user && (
+                            <button
+                            className="reply-btn"
+                            onClick={() => {
+                              setReplyingTo({
+                                commentId: reply.comment_id,
+                                userName: reply.user_name,
+                                rootId: comment.comment_id
+                              });
+                              setReplyText("");
+                            }}>
+                              <Reply size={14} />
+                              Balas
                             </button>
                           )}
                         </div>
@@ -387,6 +435,40 @@ const CommentsPage = () => {
           )}
         </div>
       </div>
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+      <div className="modal-overlay">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <h3>Konfirmasi Hapus</h3>
+            <p>Apakah Anda yakin ingin menghapus komentar ini?</p>
+            <div className="modal-actions">
+              <button 
+                className="btn-cancel"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setCommentToDelete(null);
+                }}>
+                Batal
+              </button>
+              <button 
+                className="btn-confirm"
+                onClick={handleDeleteComment}>
+                Hapus
+              </button>
+            </div>
+          </div>
+       </div>
+      </div>
+      )}
+
+      {toast && (
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast(null)}
+      />
+      )}
     </div>
   );
 };
