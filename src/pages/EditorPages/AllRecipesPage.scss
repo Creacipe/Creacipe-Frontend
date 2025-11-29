@@ -72,14 +72,14 @@
       transition: all 0.2s;
 
       &:hover {
-        border-color: #3b82f6;
+        border-color: #667eea;
         background: #f0f9ff;
       }
 
       &.active {
-        background: #3b82f6;
+        background: #667eea;
         color: white;
-        border-color: #3b82f6;
+        border-color: #667eea;
       }
 
       &.pending.active {
@@ -283,15 +283,15 @@
       min-width: 40px;
 
       &:hover:not(:disabled) {
-        border-color: #3b82f6;
+        border-color: #667eea;
         background: #f0f9ff;
-        color: #3b82f6;
+        color: #667eea;
       }
 
       &.active {
-        background: #3b82f6;
+        background: #667eea;
         color: white;
-        border-color: #3b82f6;
+        border-color: #667eea;
       }
 
       &:disabled {

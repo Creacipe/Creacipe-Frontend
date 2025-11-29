@@ -6,8 +6,14 @@
   padding: 1rem 2rem;
   background-color: #ffffff;
   border-bottom: 1px solid #eee;
+
+  position: sticky; /* Bisa juga pakai 'fixed' tapi perlu atur width 100% */
+  top: 0;           /* Menempel di paling atas */
+  z-index: 1000;    /* Agar selalu di atas konten lain */
+  width: 100%;      /* Pastikan lebar penuh */
+  box-sizing: border-box; /* Agar padding tidak menambah lebar total */
+
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: relative;
 
   .navbar-logo a {
     color: #333;
@@ -86,14 +92,15 @@
 
   .navbar-login-button {
     color: #fff;
-    background-color: #007bff;
+    background-color: #667eea;
     padding: 0.5rem 1rem;
     text-decoration: none;
     border-radius: 8px;
     font-weight: 600;
+    transition: all 0.3s ease;
 
     &:hover {
-      background-color: #0056b3;
+      background-color: #2e3867;
     }
   }
 
@@ -132,6 +139,12 @@
 
       &.active {
         right: 0;
+      }
+
+      .navbar-links {
+        flex-direction: column; /* Link turun ke bawah di mobile */
+        width: 100%;
+        gap: 1rem;
       }
     }
 

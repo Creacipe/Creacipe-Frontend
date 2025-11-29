@@ -1,6 +1,6 @@
 // LOKASI: src/components/ui/Navbar/Navbar.jsx (VERSI DIPERBARUI)
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import Profile from '../Profile/Profile';
@@ -10,6 +10,23 @@ import './Navbar.scss';
 const Navbar = () => {
   const { isLoggedIn, loading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Jika scroll lebih dari 50px, ubah state menjadi true
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Cleanup event listener saat unmount
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -43,7 +60,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar-container">
+    <nav className={`navbar-container ${isScrolled ? "scrolled" : ""}`}>
       <div className="navbar-logo">
         <Link to="/" onClick={closeMobileMenu}>CREACIPE</Link> 
       </div>
@@ -61,6 +78,9 @@ const Navbar = () => {
       {/* Mobile & Desktop Menu */}
       <div className={`navbar-menu ${isMobileMenuOpen ? "active" : ""}`}>
         <div className="navbar-links">
+          <Link to="/latest-recipes" onClick={closeMobileMenu}>Recipes</Link>
+          <Link to="#" onClick={closeMobileMenu}>Community</Link>
+          <Link to="#" onClick={closeMobileMenu}>App</Link>
         </div>
         <div className="navbar-auth">{renderAuthSection()}</div>
       </div>

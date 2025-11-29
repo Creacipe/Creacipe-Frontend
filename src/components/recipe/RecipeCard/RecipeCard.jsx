@@ -183,108 +183,85 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
   };
 
   return (
-    // Pastikan menuId tidak undefined sebelum membuat Link
     menuId ? (
-      <div className="recipe-card">
-        <Link to={`/menu/${menuId}`} className="recipe-card-link" state={sourceFrom ? { from: sourceFrom } : undefined}>
-          <div className="recipe-card-image">
-            <img src={imageUrl} alt={title} />
-            {/* Status badge untuk resep milik user */}
-            {showStatus && menu.status && (
-              <div className="status-overlay">
-                <StatusBadge status={menu.status} />
-              </div>
-            )}
-          </div>
-          <div className="recipe-card-content">
-            <h3 className="recipe-card-title">{title}</h3>
-            {/* Tags Display */}
-            {tags && tags.length > 0 && (
-              <div className="recipe-card-tags">
-                {tags.map((tag) => (
-                  <span key={tag.tag_id} className="tag-pill">
-                    {tag.tag_name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        </Link>
+      <div className="recipe-card-modern">
+        <div className="card-image-wrapper">
+          <Link to={`/menu/${menuId}`} state={sourceFrom ? { from: sourceFrom } : undefined}>
+            <img src={imageUrl} alt={title} loading="lazy" />
+            <div className="hover-overlay"></div>
+          </Link>
 
-        {/* Action buttons */}
-        <div className="recipe-card-actions">
-          <button
-            className={`action-btn like-btn ${isLiked ? "active" : ""}`}
-            onClick={handleLike}
-            title="Like">
-            <ThumbsUp size={18} fill={isLiked ? "currentColor" : "none"} />
-            <span>{likeCount}</span>
-          </button>
-
-          <button
-            className={`action-btn dislike-btn ${isDisliked ? "active" : ""}`}
-            onClick={handleDislike}
-            title="Dislike">
-            <ThumbsDown size={18} fill={isDisliked ? "currentColor" : "none"} />
-            <span>{dislikeCount}</span>
-          </button>
-
-          <button
-            className={`action-btn bookmark-btn ${
-              isBookmarked ? "active" : ""
-            }`}
-            onClick={handleBookmark}
-            title="Bookmark">
-            <Bookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
-            <span>{bookmarkCount}</span>
-          </button>
-
-          {/* Dropdown More untuk Edit & Delete */}
-          {showActions && (
-            <div className="more-actions-container">
-              <button
-                className="action-btn more-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowDropdown(!showDropdown);
-                }}
-                title="More">
-                <MoreVertical size={18} />
-              </button>
-
-              {showDropdown && (
-                <div className="dropdown-menu" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    className="dropdown-item edit-item"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowDropdown(false);
-                      if (onEdit) onEdit(menuId);
-                    }}>
-                    <Edit2 size={16} />
-                    <span>Edit</span>
-                  </button>
-
-                  <button
-                    className="dropdown-item delete-item"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowDropdown(false);
-                      if (onDelete) onDelete(menuId, title);
-                    }}>
-                    <Trash2 size={16} />
-                    <span>Hapus</span>
-                  </button>
-                </div>
-              )}
+          {/* Floating Status Badge (Top Left) */}
+          {showStatus && menu.status && (
+            <div className="status-badge-float">
+              <StatusBadge status={menu.status} />
             </div>
           )}
+
+          {/* Floating Bookmark Button (Top Right) - Signature Style */}
+          <button
+            className={`float-action-btn ${isBookmarked ? "active" : ""}`}
+            onClick={handleBookmark}
+            title="Simpan Resep">
+            <Bookmark size={20} fill={isBookmarked ? "#FF6B6B" : "none"} stroke={isBookmarked ? "#FF6B6B" : "currentColor"} />
+          </button>
+        </div>
+
+        <div className="card-content">
+          {/* Title */}
+          <Link to={`/menu/${menuId}`} className="card-title-link" state={sourceFrom ? { from: sourceFrom } : undefined}>
+            <h3>{title}</h3>
+          </Link>
+
+          {/* Tags (Optional: Bisa disembunyikan jika ingin sangat minimalis) */}
+          {tags && tags.length > 0 && (
+            <div className="card-tags">
+              {tags.slice(0, 2).map((tag) => ( // Tampilkan max 2 tags agar tidak penuh
+                <span key={tag.tag_id} className="mini-tag">{tag.tag_name}</span>
+              ))}
+            </div>
+          )}
+
+          {/* Footer: Like/Dislike & More Actions */}
+          <div className="card-footer">
+            <div className="social-actions">
+              <button className={`icon-btn ${isLiked ? "liked" : ""}`} onClick={handleLike}>
+                <ThumbsUp size={16} />
+                <span>{likeCount}</span>
+              </button>
+              <button className={`icon-btn ${isDisliked ? "disliked" : ""}`} onClick={handleDislike}>
+                <ThumbsDown size={16} />
+              </button>
+            </div>
+
+            {/* Admin/User Actions (Edit/Delete) */}
+            {showActions && (
+              <div className="more-actions-container">
+                <button
+                  className="icon-btn more-btn"
+                  onClick={(e) => { e.preventDefault(); setShowDropdown(!showDropdown); }}>
+                  <MoreVertical size={18} />
+                </button>
+                {showDropdown && (
+                  <div className="dropdown-menu">
+                    <button onClick={(e) => { 
+                        e.preventDefault(); setShowDropdown(false); if (onEdit) onEdit(menuId); 
+                      }}>
+                      <Edit2 size={14} /> Edit
+                    </button>
+                    <button className="delete" onClick={(e) => { 
+                        e.preventDefault(); setShowDropdown(false); if (onDelete) onDelete(menuId, title); 
+                      }}>
+                      <Trash2 size={14} /> Hapus
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    ) : null // Jangan render kartu jika tidak ada ID
+    ) : null
   );
 };
 
