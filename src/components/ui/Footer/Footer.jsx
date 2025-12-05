@@ -4,7 +4,7 @@ import './Footer.scss';
 
 const Footer = () => {
   return (
-    <footer id="community-footer" className="kitchen-footer">
+    <footer className="kitchen-footer">
       <div className="footer-content">
         
         {/* BAGIAN TENGAH: TENTANG KAMI */}
@@ -15,14 +15,7 @@ const Footer = () => {
             dan menyimpan resep favorit mereka. Misi kami adalah membuat kegiatan memasak 
             menjadi lebih menyenangkan, kreatif, dan mudah diakses oleh siapa saja.
           </p>
-          
-          {/* Social Icons */}
-          <div className="social-links-simple">
-             <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
-             <a href="#" aria-label="Instagram"><Instagram size={20} /></a>
-          </div>
         </div>
-
       </div>
 
       {/* FOOTER BOTTOM */}
