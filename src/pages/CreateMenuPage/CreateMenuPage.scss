@@ -1,4 +1,6 @@
 /* LOKASI: src/pages/CreateMenuPage/CreateMenuPage.scss */
+@use "sass:color"; // Import modul color
+
 
 $primary: #667eea; // Warna tema kamu
 $text-dark: #2d3436;
@@ -49,8 +51,10 @@ $bg: #f9f9f9;
     cursor: pointer;
     transition: all 0.2s;
     
-    &:hover { background-color: darken($primary, 5%); transform: translateY(-1px); }
-    &:disabled { background-color: #ccc; cursor: not-allowed; }
+    &:hover { 
+      background-color: color.adjust($primary, $lightness: -5%); 
+      transform: translateY(-1px); 
+    }    &:disabled { background-color: #ccc; cursor: not-allowed; }
   }
 }
 

@@ -208,14 +208,6 @@ const HomePage = () => {
             </>
           )}
         </section>
-
-        <section className="about-section"
-        data-aos="flip-up" // Animasi flip yang unik
-          data-aos-offset="200">
-          <h2>Tentang Kami</h2>
-          <p>Creacipe hadir untuk membuat aktivitas memasak menjadi lebih mudah dan menyenangkan.</p>
-        </section>
-
       </div>
     </div>
   );
