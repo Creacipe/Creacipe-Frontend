@@ -28,17 +28,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToFooter = (e) => {
-    e.preventDefault(); // Mencegah URL berubah menjadi '#'
-  
-    if (closeMobileMenu) closeMobileMenu(); // Jalankan fungsi tutup menu (jika ada)
-
-    const footerElement = document.getElementById('community-footer');
-    if (footerElement) {
-    footerElement.scrollIntoView({ behavior: 'smooth' }); // Scroll halus ke bawah
-    }
-  };
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -92,7 +81,6 @@ const Navbar = () => {
       <div className={`navbar-menu ${isMobileMenuOpen ? "active" : ""}`}>
         <div className="navbar-links">
           <Link to="/latest-recipes" onClick={closeMobileMenu}>Recipes</Link>
-          <Link to="#" onClick={scrollToFooter}>Community</Link>
         </div>
         <div className="navbar-auth">{renderAuthSection()}</div>
       </div>
