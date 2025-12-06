@@ -4,6 +4,7 @@ import { menuService } from "../../services/menuService";
 import RecipeCard from "../../components/recipe/RecipeCard/RecipeCard";
 import { useAuth } from "../../context/AuthContext";
 import FeaturedRecipe from '../../components/ui/FeaturedRecipe/FeaturedRecipe';
+import FeaturedRecipe from '../../components/ui/FeaturedRecipe/FeaturedRecipe';
 import "./HomePage.scss";
 
 const HomePage = () => {
@@ -21,6 +22,7 @@ const HomePage = () => {
   const [popularError, setPopularError] = useState(null);
   const [latestError, setLatestError] = useState(null);
 
+  // --- USE EFFECTS FETCH DATA (Biarkan sama seperti sebelumnya) ---
   // State untuk Sapaan (Greeting)
   const [greeting, setGreeting] = useState("Mau masak apa hari ini?");
 
@@ -33,6 +35,8 @@ const HomePage = () => {
         setPopularLoading(true);
         setPopularError(null);
         const response = await menuService.getPopularMenus();
+        // Ambil 7 data (2 Hero + 5 Grid)
+        setPopularMenus(response.data.data.slice(0, 7)); 
         // Ambil 7 data (2 Hero + 5 Grid)
         setPopularMenus(response.data.data.slice(0, 7)); 
       } catch (err) {
@@ -78,6 +82,14 @@ const HomePage = () => {
       }
     };
     fetchLatestMenus();
+  }, []);
+
+  useEffect(() => {
+    const phrases = [
+      "Hari ini mau masak apa?", "Temukan inspirasi rasa baru.", 
+      "Lapar? Ayo cari resep spesial!", "Jelajahi ribuan resep lezat."
+    ];
+    setGreeting(phrases[Math.floor(Math.random() * phrases.length)]);
   }, []);
 
   useEffect(() => {
@@ -208,14 +220,6 @@ const HomePage = () => {
             </>
           )}
         </section>
-
-        <section className="about-section"
-        data-aos="flip-up" // Animasi flip yang unik
-          data-aos-offset="200">
-          <h2>Tentang Kami</h2>
-          <p>Creacipe hadir untuk membuat aktivitas memasak menjadi lebih mudah dan menyenangkan.</p>
-        </section>
-
       </div>
     </div>
   );

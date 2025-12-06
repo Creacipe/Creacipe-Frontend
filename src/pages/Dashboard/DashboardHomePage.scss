@@ -1,4 +1,5 @@
 // LOKASI: src/pages/Dashboard/DashboardHomePage.scss
+@use "sass:map"; // Import modul color
 
 $primary: #667eea;
 $primary-dark: #764ba2;
@@ -110,13 +111,13 @@ $status-colors: (
   @each $name, $colors in $status-colors {
     &.#{$name} {
       .stat-icon {
-        background-color: map-get($colors, bg);
-        color: map-get($colors, text);
+        background-color: map.get($colors, bg);
+        color: map.get($colors, text);
       }
       
       .stat-link {
         &:hover {
-          color: map-get($colors, text);
+          color: map.get($colors, text);
         }
       }
     }
