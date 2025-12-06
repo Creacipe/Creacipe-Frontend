@@ -4,7 +4,6 @@ import { menuService } from "../../services/menuService";
 import RecipeCard from "../../components/recipe/RecipeCard/RecipeCard";
 import { useAuth } from "../../context/AuthContext";
 import FeaturedRecipe from '../../components/ui/FeaturedRecipe/FeaturedRecipe';
-import FeaturedRecipe from '../../components/ui/FeaturedRecipe/FeaturedRecipe';
 import "./HomePage.scss";
 
 const HomePage = () => {

@@ -1,6 +1,6 @@
 // LOKASI: src/components/ui/Navbar/Navbar.jsx (VERSI DIPERBARUI)
 
-import React, {useState, useEffect, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import Profile from '../Profile/Profile';
