@@ -213,7 +213,7 @@
         color: #495057;
 
         &.btn-edit {
-          &:hover {
+          &:hover:not(:disabled) {
             background: #ffeaa7;
             color: #f39c12;
             transform: scale(1.1);
@@ -221,7 +221,7 @@
         }
 
         &.btn-role {
-          &:hover {
+          &:hover:not(:disabled) {
             background: #74b9ff;
             color: #0984e3;
             transform: scale(1.1);
@@ -229,7 +229,7 @@
         }
 
         &.btn-activate {
-          &:hover {
+          &:hover:not(:disabled) {
             background: #55efc4;
             color: #00b894;
             transform: scale(1.1);
@@ -237,7 +237,7 @@
         }
 
         &.btn-deactivate {
-          &:hover {
+          &:hover:not(:disabled) {
             background: #fab1a0;
             color: #e17055;
             transform: scale(1.1);
@@ -245,11 +245,18 @@
         }
 
         &.btn-delete {
-          &:hover {
+          &:hover:not(:disabled) {
             background: #ff7675;
             color: #d63031;
             transform: scale(1.1);
           }
+        }
+
+        // Styling untuk tombol yang disabled (admin protection)
+        &:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+          pointer-events: none;
         }
       }
     }
@@ -333,6 +340,30 @@
         font-weight: 500;
         font-size: 0.9rem;
         margin-top: 1rem;
+      }
+    }
+
+    .related-data-warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+
+      p {
+        margin: 0 0 0.5rem 0;
+        color: #856404;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.5rem;
+
+        li {
+          color: #856404;
+          margin-bottom: 0.25rem;
+          font-size: 0.9rem;
+        }
       }
     }
 

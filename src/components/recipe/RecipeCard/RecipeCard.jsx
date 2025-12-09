@@ -1,7 +1,7 @@
 // LOKASI: src/components/recipe/RecipeCard/RecipeCard.jsx (VERSI DIPERBARUI)
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { menuService } from "../../../services/menuService";
 import { useAuth } from "../../../context/AuthContext";
 import StatusBadge from "../../StatusBadge/StatusBadge";
@@ -10,6 +10,7 @@ import "./RecipeCard.scss";
 
 const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark, showActions = false, onEdit, onDelete }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -69,7 +70,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
     };
 
     setTimeout(() => { document.addEventListener('click', handleClickOutside); }, 0); // To avoid immediate trigger on the same click
-    
+
     return () => document.removeEventListener('click', handleClickOutside);
   }, [showDropdown]);
 
@@ -79,7 +80,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
 
     // Jika user belum login, arahkan ke login
     if (!user) {
-      alert("Silakan login terlebih dahulu untuk memberikan like");
+      navigate("/login");
       return;
     }
 
@@ -117,7 +118,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
 
     // Jika user belum login, arahkan ke login
     if (!user) {
-      alert("Silakan login terlebih dahulu untuk memberikan dislike");
+      navigate("/login");
       return;
     }
 
@@ -155,7 +156,7 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
 
     // Jika user belum login, arahkan ke login
     if (!user) {
-      alert("Silakan login terlebih dahulu untuk bookmark");
+      navigate("/login");
       return;
     }
 
@@ -244,14 +245,14 @@ const RecipeCard = ({ menu, showStatus = false, sourceFrom = null, onUnbookmark,
                 </button>
                 {showDropdown && (
                   <div className="dropdown-menu">
-                    <button onClick={(e) => { 
-                        e.preventDefault(); setShowDropdown(false); if (onEdit) onEdit(menuId); 
-                      }}>
+                    <button onClick={(e) => {
+                      e.preventDefault(); setShowDropdown(false); if (onEdit) onEdit(menuId);
+                    }}>
                       <Edit2 size={14} /> Edit
                     </button>
-                    <button className="delete" onClick={(e) => { 
-                        e.preventDefault(); setShowDropdown(false); if (onDelete) onDelete(menuId, title); 
-                      }}>
+                    <button className="delete" onClick={(e) => {
+                      e.preventDefault(); setShowDropdown(false); if (onDelete) onDelete(menuId, title);
+                    }}>
                       <Trash2 size={14} /> Hapus
                     </button>
                   </div>

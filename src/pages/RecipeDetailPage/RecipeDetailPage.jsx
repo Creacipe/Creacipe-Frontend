@@ -127,8 +127,15 @@ const RecipeDetailPage = () => {
     fetchRecommendations();
   }, [id, showRecommendations]); // Tambahkan showRecommendations sebagai dependency
 
-  // Fetch preview comments (3 terbaru)
+  // Fetch preview comments (3 terbaru) - Hanya untuk user yang login
   useEffect(() => {
+    // Skip fetch jika user belum login
+    if (!isLoggedIn) {
+      setComments([]);
+      setCommentCount(0);
+      return;
+    }
+
     const fetchComments = async () => {
       try {
         const response = await commentService.getCommentsByMenu(id);
@@ -137,12 +144,14 @@ const RecipeDetailPage = () => {
         setComments(allComments.slice(0, 3)); // Ambil 3 terbaru saja
       } catch (err) {
         console.error("Gagal mengambil komentar:", err);
+        setComments([]);
+        setCommentCount(0);
       }
     };
     fetchComments();
-  }, [id]);
+  }, [id, isLoggedIn]);
 
-   useEffect(() => {
+  useEffect(() => {
     // Hanya fetch jika user sudah login
     if (!isLoggedIn || !user) {
       // Reset ke default jika belum login
@@ -264,7 +273,7 @@ const RecipeDetailPage = () => {
         }
       }} className="back-button">
         &lt;
-        
+
       </button>
 
       {/* Header: Judul + Author */}
@@ -331,78 +340,77 @@ const RecipeDetailPage = () => {
         <div className="action-buttons-container">
           <button
             onClick={handleLike}
-            className={`action-button ${
-              voteStatus === 1 ? "active-like" : ""
-            }`}>
+            className={`action-button ${voteStatus === 1 ? "active-like" : ""
+              }`}>
             <ThumbsUp size={20} fill={voteStatus === 1 ? "currentColor" : "none"} />
             <span>{likeCount}</span>
           </button>
           <button
             onClick={handleDislike}
-            className={`action-button ${
-              voteStatus === -1 ? "active-dislike" : ""
-            }`}>
+            className={`action-button ${voteStatus === -1 ? "active-dislike" : ""
+              }`}>
             <ThumbsDown size={20} fill={voteStatus === -1 ? "currentColor" : "none"} />
             <span>{dislikeCount}</span>
           </button>
           <button
             onClick={handleBookmarkToggle}
-            className={`action-button ${
-              isBookmarked ? "active-bookmark" : ""
-            }`}>
+            className={`action-button ${isBookmarked ? "active-bookmark" : ""
+              }`}>
             <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
             <span>{bookmarkCount}</span>
           </button>
         </div>
       )}
 
-      {/* Preview Komentar - Tersedia untuk semua resep */}
-      <div className="comment-preview-section">
-        <div className="comment-header">
-          <h3>
-            <MessageCircle size={24} />
-            Komentar ({commentCount})
-          </h3>
-        </div>
+      {/* Preview Komentar - Hanya untuk user yang login */}
+      {isLoggedIn && (
+        <div className="comment-preview-section">
+          <div className="comment-header">
+            <h3>
+              <MessageCircle size={24} />
+              Komentar ({commentCount})
+            </h3>
+          </div>
 
           {comments.length === 0 ? (
-          <div className="no-comments">
-            <MessageCircle size={48} />
-            <p>Belum ada komentar</p>
-            <span>{isOwnRecipe ? "Jadilah yang pertama berkomentar di resep Anda!" : "Jadilah yang pertama berkomentar!"}</span>
-          </div>
-        ) : (
-          <div className="comments-preview-list">
-            {comments.map((comment) => (
-              <div key={comment.comment_id} className="comment-preview-item">
-                <div className="comment-avatar">
-                  {comment.user_avatar ? (
-                    <img
-                      src={`http://localhost:8080${comment.user_avatar}`}
-                      alt={comment.user_name}
-                    />
-                  ) : (
-                    <User size={24} />
-                  )}
+            <div className="no-comments">
+              <MessageCircle size={48} />
+              <p>Belum ada komentar</p>
+              <span>{isOwnRecipe ? "Jadilah yang pertama berkomentar di resep Anda!" : "Jadilah yang pertama berkomentar!"}</span>
+            </div>
+          ) : (
+            <div className="comments-preview-list">
+              {comments.map((comment) => (
+                <div key={comment.comment_id} className="comment-preview-item">
+                  <div className="comment-avatar">
+                    {comment.user_avatar ? (
+                      <img
+                        src={`http://localhost:8080${comment.user_avatar}`}
+                        alt={comment.user_name}
+                      />
+                    ) : (
+                      <User size={24} />
+                    )}
+                  </div>
+                  <div className="comment-content">
+                    <strong>{comment.user_name}</strong>
+                    <p>{comment.comment_text}</p>
+                  </div>
                 </div>
-                <div className="comment-content">
-                  <strong>{comment.user_name}</strong>
-                  <p>{comment.comment_text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
           <Link to={`/menu/${id}/comments`} className="view-all-comments-btn">
-          <MessageCircle size={18} />
-          {commentCount > 0
-            ? "Lihat Semua Komentar & Beri Komentar"
-            : isOwnRecipe 
-              ? "Beri Komentar atau Tips Tambahan"
-              : "Beri Komentar"}
+            <MessageCircle size={18} />
+            {commentCount > 0
+              ? "Lihat Semua Komentar & Beri Komentar"
+              : isOwnRecipe
+                ? "Beri Komentar atau Tips Tambahan"
+                : "Beri Komentar"}
           </Link>
         </div>
+      )}
 
       {/* BAGIAN REKOMENDASI */}
       {showRecommendations && recommendations.length > 0 && (

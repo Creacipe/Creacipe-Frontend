@@ -22,6 +22,7 @@ const UserManagementPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [relatedData, setRelatedData] = useState(null); // Data terkait user yang akan dihapus
   const [userToToggle, setUserToToggle] = useState(null);
   const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', or 'role'
   const [selectedUser, setSelectedUser] = useState(null);
@@ -167,9 +168,19 @@ const UserManagementPage = () => {
     }
   };
 
-  const handleDeleteClick = (user) => {
+  const handleDeleteClick = async (user) => {
     setUserToDelete(user);
+    setRelatedData(null); // Reset related data
     setShowDeleteModal(true);
+
+    // Fetch data terkait user
+    try {
+      const response = await dashboardService.getUserRelatedData(user.user_id);
+      setRelatedData(response.data.data);
+    } catch (err) {
+      console.error("Error fetching related data:", err);
+      // Jika gagal, tetap tampilkan modal tanpa info data terkait
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -182,13 +193,21 @@ const UserManagementPage = () => {
       fetchData();
       setToast({ type: "success", message: "User berhasil dihapus!" });
     } catch (err) {
+      // Tutup modal terlebih dahulu
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+
+      // Ambil pesan error dari berbagai kemungkinan struktur response
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Gagal menghapus user. User mungkin memiliki data terkait (resep, komentar, dll).";
+
       setToast({
         type: "error",
-        message:
-          err.response?.data?.message ||
-          "Gagal menghapus user. Silakan coba lagi.",
+        message: errorMessage,
       });
-      console.error(err);
+      console.error("Delete user error:", err);
     }
   };
 
@@ -298,9 +317,8 @@ const UserManagementPage = () => {
                     </td>
                     <td>
                       <span
-                        className={`status-badge ${
-                          isActive ? "active" : "inactive"
-                        }`}>
+                        className={`status-badge ${isActive ? "active" : "inactive"
+                          }`}>
                         {isActive ? "Aktif" : "Nonaktif"}
                       </span>
                     </td>
@@ -308,34 +326,44 @@ const UserManagementPage = () => {
                       {new Date(user.created_at).toLocaleDateString("id-ID")}
                     </td>
                     <td>
-                      <div className="action-buttons">
-                        <button
-                          className="btn-action btn-edit"
-                          onClick={() => handleOpenModal("edit", user)}
-                          title="Edit">
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          className="btn-action btn-role"
-                          onClick={() => handleOpenModal("role", user)}
-                          title="Ubah Role">
-                          <Key size={18} />
-                        </button>
-                        <button
-                          className={`btn-action ${
-                            isActive ? "btn-deactivate" : "btn-activate"
-                          }`}
-                          onClick={() => handleToggleStatus(user)}
-                          title={isActive ? "Nonaktifkan" : "Aktifkan"}>
-                          {isActive ? <Lock size={18} /> : <Unlock size={18} />}
-                        </button>
-                        <button
-                          className="btn-action btn-delete"
-                          onClick={() => handleDeleteClick(user)}
-                          title="Hapus">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                      {(() => {
+                        // Cek apakah user ini adalah admin
+                        const isAdmin = user.Role?.role_name === "admin";
+
+                        return (
+                          <div className="action-buttons">
+                            <button
+                              className="btn-action btn-edit"
+                              onClick={() => handleOpenModal("edit", user)}
+                              title={isAdmin ? "Tidak dapat mengedit admin" : "Edit"}
+                              disabled={isAdmin}>
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              className="btn-action btn-role"
+                              onClick={() => handleOpenModal("role", user)}
+                              title={isAdmin ? "Tidak dapat mengubah role admin" : "Ubah Role"}
+                              disabled={isAdmin}>
+                              <Key size={18} />
+                            </button>
+                            <button
+                              className={`btn-action ${isActive ? "btn-deactivate" : "btn-activate"
+                                }`}
+                              onClick={() => handleToggleStatus(user)}
+                              title={isAdmin ? "Tidak dapat mengubah status admin" : (isActive ? "Nonaktifkan" : "Aktifkan")}
+                              disabled={isAdmin}>
+                              {isActive ? <Lock size={18} /> : <Unlock size={18} />}
+                            </button>
+                            <button
+                              className="btn-action btn-delete"
+                              onClick={() => handleDeleteClick(user)}
+                              title={isAdmin ? "Tidak dapat menghapus admin" : "Hapus"}
+                              disabled={isAdmin}>
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </td>
                   </tr>
                 );
@@ -360,9 +388,8 @@ const UserManagementPage = () => {
             return (
               <button
                 key={pageNumber}
-                className={`pagination-btn ${
-                  currentPage === pageNumber ? "active" : ""
-                }`}
+                className={`pagination-btn ${currentPage === pageNumber ? "active" : ""
+                  }`}
                 onClick={() => handlePageChange(pageNumber)}>
                 {pageNumber}
               </button>
@@ -454,23 +481,27 @@ const UserManagementPage = () => {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label htmlFor="role_id">Role</label>
-                    <select
-                      id="role_id"
-                      value={formData.role_id}
-                      onChange={(e) =>
-                        setFormData({ ...formData, role_id: e.target.value })
-                      }
-                      required>
-                      {roles.map((role) => (
-                        <option key={role.role_id} value={role.role_id}>
-                          {role.role_name.charAt(0).toUpperCase() +
-                            role.role_name.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Role Selector - Hanya muncul saat Create User */}
+                  {modalMode === "create" && (
+                    <div className="form-group">
+                      <label htmlFor="role_id">Role</label>
+                      <select
+                        id="role_id"
+                        value={formData.role_id}
+                        onChange={(e) =>
+                          setFormData({ ...formData, role_id: e.target.value })
+                        }
+                        required>
+                        {roles.map((role) => (
+                          <option key={role.role_id} value={role.role_id}>
+                            {role.role_name.charAt(0).toUpperCase() +
+                              role.role_name.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                 </>
               )}
 
@@ -501,6 +532,28 @@ const UserManagementPage = () => {
               Apakah Anda yakin ingin menghapus user{" "}
               <strong>"{userToDelete?.name}"</strong>?
             </p>
+
+            {/* Tampilkan peringatan data terkait */}
+            {relatedData && relatedData.has_related_data && (
+              <div className="related-data-warning">
+                <p><strong>⚠️ User ini memiliki data berikut yang akan ikut terhapus:</strong></p>
+                <ul>
+                  {relatedData.menus_count > 0 && (
+                    <li>🍳 {relatedData.menus_count} resep</li>
+                  )}
+                  {relatedData.comments_count > 0 && (
+                    <li>💬 {relatedData.comments_count} komentar</li>
+                  )}
+                  {relatedData.votes_count > 0 && (
+                    <li>👍 {relatedData.votes_count} like/dislike</li>
+                  )}
+                  {relatedData.bookmarks_count > 0 && (
+                    <li>🔖 {relatedData.bookmarks_count} bookmark</li>
+                  )}
+                </ul>
+              </div>
+            )}
+
             <p className="modal-warning">
               Tindakan ini tidak dapat dibatalkan.
             </p>

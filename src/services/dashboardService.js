@@ -19,9 +19,9 @@ const getPendingRecipes = () => {
 };
 
 const updateMenuStatus = (id, status, rejectionReason = "") => {
-  return api.patch(`/editor/menus/${id}/status`, { 
+  return api.patch(`/editor/menus/${id}/status`, {
     status: status,
-    rejection_reason: rejectionReason 
+    rejection_reason: rejectionReason
   });
 };
 
@@ -58,6 +58,10 @@ const activateUser = (id) => {
   return api.patch(`/admin/users/${id}/activate`);
 };
 
+const getUserRelatedData = (id) => {
+  return api.get(`/admin/users/${id}/related-data`);
+};
+
 const deleteUser = (id) => {
   return api.delete(`/admin/users/${id}`);
 };
@@ -83,6 +87,7 @@ export const dashboardService = {
   updateUserRole,
   deactivateUser,
   activateUser,
+  getUserRelatedData,
   deleteUser,
   getAllRoles,
   getActivityLogs,

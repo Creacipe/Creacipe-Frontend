@@ -1,26 +1,26 @@
 /* LOKASI: src/components/recipe/RecipeCard/RecipeCard.scss */
 
 // Variable Warna (Tetap dipertahankan agar rapi)
-$primary-color: #FF6B6B; 
+$primary-color: #FF6B6B;
 $text-dark: #2d3436;
 $text-light: #636e72;
 $bg-white: #ffffff;
 
 .recipe-card-modern {
   background: $bg-white;
-  border-radius: 12px; 
-  overflow: hidden;
+  border-radius: 12px;
+  // overflow: hidden dihapus agar dropdown dapat muncul di luar card
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  border: 1px solid rgba(0,0,0,0.05); 
+  border: 1px solid rgba(0, 0, 0, 0.05);
 
   // Font akan mengikuti settingan global body/app Anda
-  font-family: inherit; 
+  font-family: inherit;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-    
+
     .card-image-wrapper img {
       transform: scale(1.05);
     }
@@ -33,6 +33,7 @@ $bg-white: #ffffff;
     padding-top: 75%; // Aspect Ratio 4:3
     overflow: hidden;
     background-color: #f1f2f6;
+    border-radius: 12px 12px 0 0; // Rounded corners di atas
 
     img {
       position: absolute;
@@ -47,12 +48,12 @@ $bg-white: #ffffff;
     .hover-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0);
+      background: rgba(0, 0, 0, 0);
       transition: background 0.3s;
     }
-    
+
     &:hover .hover-overlay {
-      background: rgba(0,0,0,0.05);
+      background: rgba(0, 0, 0, 0.05);
     }
 
     // Tombol Bookmark Melayang
@@ -69,14 +70,14 @@ $bg-white: #ffffff;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       transition: all 0.2s;
       z-index: 10;
       color: #b2bec3; // Warna abu-abu default
 
       &:hover {
         transform: scale(1.1);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
       }
 
       &.active {
@@ -102,7 +103,7 @@ $bg-white: #ffffff;
     .card-title-link {
       text-decoration: none;
       color: inherit;
-      
+
       h3 {
         // HAPUS font-family specific, kembali ke default
         font-size: 1.1rem;
@@ -110,7 +111,7 @@ $bg-white: #ffffff;
         color: $text-dark;
         margin: 0;
         line-height: 1.4;
-        
+
         // Limit text to 2 lines
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -127,7 +128,7 @@ $bg-white: #ffffff;
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      
+
       .mini-tag {
         font-size: 0.7rem;
         background-color: #f5f6fa;
@@ -163,44 +164,53 @@ $bg-white: #ffffff;
           font-size: 0.85rem;
           padding: 0;
           transition: color 0.2s;
-          
+
           // Pastikan font angka juga normal
           span {
             font-weight: 500;
           }
 
           &:hover {
-             color: $text-dark;
+            color: $text-dark;
           }
 
-          &.liked { color: $primary-color; }
-          &.disliked { color: #e74c3c; }
+          &.liked {
+            color: $primary-color;
+          }
+
+          &.disliked {
+            color: #e74c3c;
+          }
         }
       }
 
       // Styling untuk Dropdown More Actions
       .more-actions-container {
         position: relative;
-        
+
         .more-btn {
           background: none;
           border: none;
           cursor: pointer;
           color: $text-light;
           padding: 4px;
-          &:hover { color: $text-dark; }
+
+          &:hover {
+            color: $text-dark;
+          }
         }
 
         .dropdown-menu {
           position: absolute;
-          bottom: 100%;
+          top: 100%;
           right: 0;
+          margin-top: 4px;
           background: white;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
           border-radius: 8px;
           padding: 4px;
           width: 120px;
-          z-index: 100;
+          z-index: 1000;
           display: flex;
           flex-direction: column;
           gap: 2px;
@@ -220,8 +230,17 @@ $bg-white: #ffffff;
             color: $text-dark;
             font-family: inherit; // Ikut font global
 
-            &:hover { background-color: #f5f6fa; }
-            &.delete { color: #e74c3c; &:hover { background-color: #fff5f5; } }
+            &:hover {
+              background-color: #f5f6fa;
+            }
+
+            &.delete {
+              color: #e74c3c;
+
+              &:hover {
+                background-color: #fff5f5;
+              }
+            }
           }
         }
       }

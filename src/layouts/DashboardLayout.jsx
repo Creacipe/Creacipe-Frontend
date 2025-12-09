@@ -49,11 +49,13 @@ const DashboardLayout = () => {
   }, []);
 
   // Auto-close sidebar on navigation for mobile/tablet ONLY
+  // Hanya trigger saat path berubah, bukan saat sidebarOpen berubah
   useEffect(() => {
-    if (isMobile && sidebarOpen) {
+    if (isMobile) {
       setSidebarOpen(false);
     }
-  }, [location.pathname, isMobile, sidebarOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]); // Hanya depend pada pathname, bukan sidebarOpen
 
   // Handle overlay fade-in/out with delay for smooth animation
   useEffect(() => {
@@ -151,9 +153,8 @@ const DashboardLayout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`sidebar ${
-          isMobile ? (sidebarOpen ? "open" : "closed") : "desktop"
-        } ${!isMobile && sidebarCollapsed ? "collapsed" : ""}`}>
+        className={`sidebar ${isMobile ? (sidebarOpen ? "open" : "closed") : "desktop"
+          } ${!isMobile && sidebarCollapsed ? "collapsed" : ""}`}>
         <div className="sidebar-container">
           {/* Sidebar Header */}
           <div className="sidebar-header">
@@ -193,9 +194,8 @@ const DashboardLayout = () => {
                         onClick={() =>
                           setOpenSubmenu(openSubmenu === index ? null : index)
                         }
-                        className={`nav-button ${
-                          sidebarCollapsed && !isMobile ? "centered" : ""
-                        }`}
+                        className={`nav-button ${sidebarCollapsed && !isMobile ? "centered" : ""
+                          }`}
                         aria-label={`Toggle ${item.title} submenu`}>
                         <span className="icon-wrapper">{item.icon}</span>
                         {(!sidebarCollapsed || isMobile) && (
@@ -220,11 +220,10 @@ const DashboardLayout = () => {
                                 onClick={() =>
                                   isMobile && setSidebarOpen(false)
                                 }
-                                className={`submenu-link ${
-                                  location.pathname === subitem.path
+                                className={`submenu-link ${location.pathname === subitem.path
                                     ? "active"
                                     : ""
-                                }`}>
+                                  }`}>
                                 {subitem.title}
                               </Link>
                             ))}
@@ -235,9 +234,8 @@ const DashboardLayout = () => {
                     <Link
                       to={item.path}
                       onClick={() => isMobile && setSidebarOpen(false)}
-                      className={`nav-link ${
-                        location.pathname === item.path ? "active" : ""
-                      } ${sidebarCollapsed && !isMobile ? "centered" : ""}`}>
+                      className={`nav-link ${location.pathname === item.path ? "active" : ""
+                        } ${sidebarCollapsed && !isMobile ? "centered" : ""}`}>
                       <span className="icon-wrapper">{item.icon}</span>
                       {(!sidebarCollapsed || isMobile) && (
                         <span>{item.title}</span>
@@ -253,9 +251,8 @@ const DashboardLayout = () => {
           <div className="sidebar-footer">
             {/* User Info */}
             <div
-              className={`user-info ${
-                sidebarCollapsed && !isMobile ? "centered" : ""
-              }`}>
+              className={`user-info ${sidebarCollapsed && !isMobile ? "centered" : ""
+                }`}>
               <div className="user-avatar">
                 {user?.Profile?.profile_picture_url ? (
                   <img
@@ -291,9 +288,8 @@ const DashboardLayout = () => {
 
       {/* Main Content */}
       <div
-        className={`main-wrapper ${
-          !isMobile && !sidebarCollapsed ? "sidebar-expanded" : ""
-        } ${!isMobile && sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+        className={`main-wrapper ${!isMobile && !sidebarCollapsed ? "sidebar-expanded" : ""
+          } ${!isMobile && sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         {/* Top Bar */}
         <header className="top-bar">
           <div className="top-bar-left">
