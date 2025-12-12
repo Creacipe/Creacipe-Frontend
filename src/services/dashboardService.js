@@ -47,7 +47,9 @@ const updateUser = (id, userData) => {
 };
 
 const updateUserRole = (id, roleId) => {
-  return api.patch(`/admin/users/${id}/role`, { role_id: roleId });
+  return api.patch(`/admin/users/${id}/role`, {
+    role_id: roleId
+  });
 };
 
 const deactivateUser = (id) => {
@@ -75,6 +77,11 @@ const getActivityLogs = () => {
   return api.get("/admin/logs");
 };
 
+// Log Evaluasi Real-time (Admin Only)
+const getEvaluationLogs = (limit = 50) => {
+  return api.get(`/admin/evaluation/logs?limit=${limit}`);
+};
+
 export const dashboardService = {
   getDashboardStats,
   getAllRecipesForModeration,
@@ -92,4 +99,5 @@ export const dashboardService = {
   getAllRoles,
   getActivityLogs,
   deleteMenu,
+  getEvaluationLogs,
 };

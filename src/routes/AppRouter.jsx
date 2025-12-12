@@ -41,6 +41,7 @@ import {
   RecipeDetailDashboard,
 } from "../pages/Dashboard";
 import ReportingPage from "../pages/ReportingPage/ReportingPage";
+import EvaluationPage from "../pages/EvaluationPage/EvaluationPage";
 
 // Routes
 import ProtectedRoute from "./ProtectedRoute";
@@ -105,6 +106,7 @@ const AppRouter = () => {
             <Route path="/dashboard/users" element={<UserManagementPage />} />
             <Route path="/dashboard/logs" element={<ActivityLogsPage />} />
             <Route path="/dashboard/reporting" element={<ReportingPage />} />
+            <Route path="/dashboard/evaluation" element={<EvaluationPage />} />
           </Route>
         </Route>
       </Routes>

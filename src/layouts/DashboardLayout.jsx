@@ -137,6 +137,12 @@ const DashboardLayout = () => {
       path: "/dashboard/logs",
       roles: [1], // Admin only
     },
+    {
+      title: "Hasil Rekomendasi",
+      icon: <BarChart3 className="icon" />,
+      path: "/dashboard/evaluation",
+      roles: [1], // Admin only
+    },
   ];
 
   const filteredMenu = menuItems.filter((item) => item.roles.includes(roleId));
