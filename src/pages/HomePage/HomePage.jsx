@@ -33,11 +33,9 @@ const HomePage = () => {
       try {
         setPopularLoading(true);
         setPopularError(null);
-        const response = await menuService.getPopularMenus();
+        const response = await menuService.getPopularMenus(1, 7);
         // Ambil 7 data (2 Hero + 5 Grid)
-        setPopularMenus(response.data.data.slice(0, 7)); 
-        // Ambil 7 data (2 Hero + 5 Grid)
-        setPopularMenus(response.data.data.slice(0, 7)); 
+        setPopularMenus(response.data.data || []); 
       } catch (err) {
         setPopularError(err.response?.data?.error || "Gagal mengambil resep populer.");
       } finally {
@@ -68,12 +66,8 @@ const HomePage = () => {
       try {
         setLatestLoading(true);
         setLatestError(null);
-        const response = await menuService.getAllMenus();
-        const approved = response.data.data
-          .filter(menu => menu.status === 'approved')
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-          .slice(0, 5);
-        setLatestMenus(approved);
+        const response = await menuService.getAllMenus(1, 5);
+        setLatestMenus(response.data.data || []);
       } catch (err) {
         setLatestError(err.response?.data?.error || "Gagal mengambil resep terbaru.");
       } finally {

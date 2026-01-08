@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import { BACKEND_URL } from "../../../services/api";
 import { Bell, User, PlusCircle, BookOpen, LogOut, LayoutDashboard } from "lucide-react";
 import { notificationService } from "../../../services/notificationService";
 import "./Profile.scss";
@@ -79,7 +80,7 @@ const Profile = () => {
 
   // Ambil foto profil dari user data
   const profilePicture = user.Profile?.profile_picture_url
-    ? `http://localhost:8080${user.Profile.profile_picture_url}`
+    ? `${BACKEND_URL}${user.Profile.profile_picture_url}`
     : null;
 
   // Cek apakah user adalah admin atau editor

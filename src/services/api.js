@@ -9,8 +9,10 @@ import {
   removeTokens,
 } from "../utils/authUtils";
 
-// 2. Tentukan baseURL
-const API_URL = "http://localhost:8080/api";
+// 2. Tentukan baseURL (menggunakan environment variable jika ada)
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+export const BACKEND_URL = API_URL.replace(/\/api$/, "");
 
 const api = axios.create({
   baseURL: API_URL,
@@ -74,14 +76,17 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       originalRequest.url !== "/auth/refresh"
     ) {
-      
+
 
       // Jika sedang dalam proses refresh, tambahkan request ke antrian
       if (isRefreshing) {
-        
+
         return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
+            failedQueue.push({
+              resolve,
+              reject
+            });
+          })
           .then((token) => {
             originalRequest.headers["Authorization"] = "Bearer " + token;
             return api(originalRequest);
@@ -102,7 +107,9 @@ api.interceptors.response.use(
       }
 
       try {
-        const { data } = await axios.post(`${API_URL}/auth/refresh`, {
+        const {
+          data
+        } = await axios.post(`${API_URL}/auth/refresh`, {
           refresh_token: refreshToken,
         });
 

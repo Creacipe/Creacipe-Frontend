@@ -19,34 +19,43 @@ const LatestRecipesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredRecipes, setFilteredRecipes] = useState([]);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const recipesPerPage = 8;
+  const recipesPerPage = 20;
 
+  // Debounce search input
   useEffect(() => {
-    const fetchInitialRecipes = async () => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1); // Reset to page 1 when search changes
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Fetch recipes when page or search changes
+  useEffect(() => {
+    const fetchRecipes = async () => {
       try {
         setLoading(true);
-        const response = await menuService.getAllMenus();
-        const sortedRecipes = response.data.data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-        setRecipes(sortedRecipes);
-        setFilteredRecipes(sortedRecipes);
+        const response = await menuService.getAllMenus(currentPage, recipesPerPage, debouncedSearch);
+        setRecipes(response.data.data || []);
+        setTotalPages(response.data.meta?.total_pages || 1);
       } catch (err) {
         setError("Gagal memuat data resep terbaru.");
-        console.error("Error fetching initial recipes:", err);
+        console.error("Error fetching recipes:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInitialRecipes();
-  }, []);
+    fetchRecipes();
+  }, [currentPage, debouncedSearch]);
 
+  // Fetch interactions for current page recipes
   useEffect(() => {
     if (!user || recipes.length === 0) return;
 
@@ -75,34 +84,6 @@ const LatestRecipesPage = () => {
 
     fetchAllInteractions();
   }, [user, recipes]);
-
-  useEffect(() => {
-    // Mirip dengan halaman Semua Resep Editor: filter di client-side
-    const query = searchTerm.toLowerCase();
-    if (query === "") {
-      setFilteredRecipes(recipes);
-    } else {
-      setFilteredRecipes(
-        recipes.filter(
-          (recipe) =>
-            recipe.menu_name?.toLowerCase().includes(query) ||
-            recipe.description?.toLowerCase().includes(query) ||
-            recipe.User?.name?.toLowerCase().includes(query)
-        )
-      );
-    }
-    setCurrentPage(1);
-  }, [searchTerm, recipes]);
-
-  // Pagination logic
-  const indexOfLastRecipe = currentPage * recipesPerPage;
-  const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
-
-  const currentRecipes = filteredRecipes.slice(
-    indexOfFirstRecipe,
-    indexOfLastRecipe
-  );
-  const totalPages = Math.ceil(filteredRecipes.length / recipesPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -138,10 +119,10 @@ const LatestRecipesPage = () => {
           <div className="loading">Memuat resep terbaru...</div>
         ) : error ? (
           <div className="error">{error}</div>
-        ) : currentRecipes.length === 0 ? (
+        ) : recipes.length === 0 ? (
           <div className="no-data">Tidak ada resep ditemukan.</div>
         ) : (
-          currentRecipes.map((recipe) => (
+          recipes.map((recipe) => (
             <RecipeCard
               key={recipe.menu_id}
               menu={recipe}
@@ -202,3 +183,4 @@ const LatestRecipesPage = () => {
 };
 
 export default LatestRecipesPage;
+

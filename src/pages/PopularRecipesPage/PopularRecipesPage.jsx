@@ -19,16 +19,19 @@ const PopularRecipesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
-  const recipesPerPage = 5;
+  const recipesPerPage = 10;
 
+  // Fetch recipes when page changes
   useEffect(() => {
     const fetchPopularRecipes = async () => {
       try {
         setLoading(true);
-        const response = await menuService.getPopularMenus();
-        setRecipes(response.data.data);
+        const response = await menuService.getPopularMenus(currentPage, recipesPerPage);
+        setRecipes(response.data.data || []);
+        setTotalPages(response.data.meta?.total_pages || 1);
       } catch (err) {
         console.error("Error fetching popular recipes:", err);
         setError(err.response?.data?.error || "Gagal mengambil resep populer.");
@@ -37,7 +40,7 @@ const PopularRecipesPage = () => {
       }
     };
     fetchPopularRecipes();
-  }, []);
+  }, [currentPage]);
 
   // Fetch interaction status for each recipe after recipes loaded & user available
   useEffect(() => {
@@ -71,11 +74,8 @@ const PopularRecipesPage = () => {
     navigate(`/menu/${menuId}`);
   };
 
-  // Pagination logic
-  const indexOfLastRecipe = currentPage * recipesPerPage;
-  const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
-  const currentRecipes = recipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
-  const totalPages = Math.ceil(recipes.length / recipesPerPage);
+  // Calculate rank based on current page
+  const getRank = (index) => (currentPage - 1) * recipesPerPage + index + 1;
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -121,8 +121,8 @@ const PopularRecipesPage = () => {
       </div>
 
       <div className="popular-recipes-list">
-        {currentRecipes.map((recipe, index) => {
-          const rank = indexOfFirstRecipe + index + 1;
+        {recipes.map((recipe, index) => {
+          const rank = getRank(index);
           const badgeClass = rank <= 3 ? `badge-${rank}` : "badge-default";
 
           return (

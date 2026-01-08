@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { commentService } from "../../services/commentService";
 import { menuService } from "../../services/menuService";
+import { BACKEND_URL } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import Toast from "../../components/ui/Toast/Toast";
 import "./CommentsPage.scss";
@@ -223,7 +224,7 @@ const CommentsPage = () => {
               <div className="user-avatar">
                 {user.profile?.profile_picture_url ? (
                   <img
-                    src={`http://localhost:8080${user.profile.profile_picture_url}`}
+                    src={`${BACKEND_URL}${user.profile.profile_picture_url}`}
                     alt={user.name}
                   />
                 ) : (
@@ -278,7 +279,7 @@ const CommentsPage = () => {
                   <div className="comment-avatar">
                     {comment.user_avatar ? (
                       <img
-                        src={`http://localhost:8080${comment.user_avatar}`}
+                        src={`${BACKEND_URL}${comment.user_avatar}`}
                         alt={comment.user_name}
                       />
                     ) : (
@@ -385,7 +386,7 @@ const CommentsPage = () => {
                         <div className="comment-avatar">
                           {reply.user_avatar ? (
                             <img
-                              src={`http://localhost:8080${reply.user_avatar}`}
+                              src={`${BACKEND_URL}${reply.user_avatar}`}
                               alt={reply.user_name}
                             />
                           ) : (

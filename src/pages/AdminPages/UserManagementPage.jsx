@@ -374,33 +374,45 @@ const UserManagementPage = () => {
       )}
 
       {/* Pagination */}
-      {!loading && filteredUsers.length > 0 && (
+      {!loading && filteredUsers.length > 0 && totalPages > 1 && (
         <div className="pagination">
           <button
             className="pagination-btn"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}>
-            Previous
+            &lt;
           </button>
 
           {[...Array(totalPages)].map((_, index) => {
             const pageNumber = index + 1;
-            return (
-              <button
-                key={pageNumber}
-                className={`pagination-btn ${currentPage === pageNumber ? "active" : ""
-                  }`}
-                onClick={() => handlePageChange(pageNumber)}>
-                {pageNumber}
-              </button>
-            );
+            // Show first page, last page, and pages around current
+            if (
+              pageNumber === 1 ||
+              pageNumber === totalPages ||
+              (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+            ) {
+              return (
+                <button
+                  key={pageNumber}
+                  className={`pagination-btn ${currentPage === pageNumber ? "active" : ""}`}
+                  onClick={() => handlePageChange(pageNumber)}>
+                  {pageNumber}
+                </button>
+              );
+            } else if (
+              pageNumber === currentPage - 2 ||
+              pageNumber === currentPage + 2
+            ) {
+              return <span key={pageNumber} className="pagination-dots">...</span>;
+            }
+            return null;
           })}
 
           <button
             className="pagination-btn"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}>
-            Next
+            &gt;
           </button>
         </div>
       )}

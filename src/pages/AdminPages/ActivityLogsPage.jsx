@@ -29,20 +29,46 @@ const ActivityLogsPage = () => {
   const [endDate, setEndDate] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const logsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const logsPerPage = 20;
 
+  // Fetch logs when page or filters change
   useEffect(() => {
     fetchLogs();
-  }, []);
+  }, [currentPage, dateFilter, startDate, endDate]);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (currentPage === 1) {
+        fetchLogs();
+      } else {
+        setCurrentPage(1); // This will trigger fetchLogs via the other useEffect
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const response = await dashboardService.getActivityLogs();
+      const response = await dashboardService.getActivityLogs(
+        currentPage,
+        logsPerPage,
+        searchQuery,
+        dateFilter,
+        startDate,
+        endDate
+      );
       const logsData = response.data.data || [];
+      const pagination = response.data.pagination || {};
       setLogs(logsData);
+      setTotalPages(pagination.total_pages || 1);
+      setTotalItems(pagination.total_items || 0);
     } catch (err) {
       console.error("Error fetching logs:", err);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -119,70 +145,6 @@ const ActivityLogsPage = () => {
     if (diffMonth < 12) return `${diffMonth} bulan yang lalu`;
     return `${diffYear} tahun yang lalu`;
   };
-
-  // Filter by date range
-  const filterByDate = (log) => {
-    const createdAt = log.created_at || log.CreatedAt;
-    if (!createdAt) return true;
-
-    const logDate = new Date(createdAt);
-    const now = new Date();
-    const diffMs = now - logDate;
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-    switch (dateFilter) {
-      case "today":
-        return diffDays < 1;
-      case "week":
-        return diffDays < 7;
-      case "month":
-        return diffDays < 30;
-      case "year":
-        return diffDays < 365;
-      case "custom":
-        if (!startDate && !endDate) return true;
-        if (startDate && !endDate) {
-          return logDate >= new Date(startDate);
-        }
-        if (!startDate && endDate) {
-          return logDate <= new Date(endDate);
-        }
-        return logDate >= new Date(startDate) && logDate <= new Date(endDate);
-      default:
-        return true;
-    }
-  };
-
-  // Filter by search query
-  const filterBySearch = (log) => {
-    const query = searchQuery.toLowerCase();
-    // Normalize field names - handle both PascalCase and snake_case
-    const userName = log.User?.name || log.User?.Name || "";
-    const description = log.description || log.Description || "";
-    const action = log.action || log.Action || "";
-
-    return (
-      userName.toLowerCase().includes(query) ||
-      description.toLowerCase().includes(query) ||
-      action.toLowerCase().includes(query)
-    );
-  };
-
-  // Apply all filters
-  const filteredLogs = logs.filter(
-    (log) => filterByDate(log) && filterBySearch(log)
-  );
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
-  const indexOfLastLog = currentPage * logsPerPage;
-  const indexOfFirstLog = indexOfLastLog - logsPerPage;
-  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, dateFilter, startDate, endDate]);
 
   // Generate log message from joined data
   const generateLogMessage = (log) => {
@@ -383,14 +345,14 @@ const ActivityLogsPage = () => {
       )}
 
       <div className="logs-info">
-        Menampilkan {indexOfFirstLog + 1}-
-        {Math.min(indexOfLastLog, filteredLogs.length)} dari{" "}
-        {filteredLogs.length} aktivitas
+        Menampilkan {logs.length > 0 ? ((currentPage - 1) * logsPerPage + 1) : 0}-
+        {Math.min(currentPage * logsPerPage, totalItems)} dari{" "}
+        {totalItems} aktivitas
       </div>
 
       {loading ? (
         <div className="loading-state">Memuat log aktivitas...</div>
-      ) : currentLogs.length === 0 ? (
+      ) : logs.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">
             <FileText size={64} />
@@ -400,7 +362,7 @@ const ActivityLogsPage = () => {
       ) : (
         <>
           <div className="logs-timeline">
-            {currentLogs.map((log, index) => {
+            {logs.map((log, index) => {
               // Normalize ALL field names - handle both PascalCase and snake_case
               const logId =
                 log.activity_id ||
@@ -432,7 +394,7 @@ const ActivityLogsPage = () => {
                     <div className={`marker-icon ${badge.class}`}>
                       <IconComponent size={16} />
                     </div>
-                    {index < currentLogs.length - 1 && (
+                    {index < logs.length - 1 && (
                       <div className="marker-line"></div>
                     )}
                   </div>

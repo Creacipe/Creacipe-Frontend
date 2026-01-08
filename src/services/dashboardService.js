@@ -72,9 +72,16 @@ const getAllRoles = () => {
   return api.get("/admin/roles");
 };
 
-// Log Aktivitas (Admin Only)
-const getActivityLogs = () => {
-  return api.get("/admin/logs");
+// Log Aktivitas (Admin Only) - dengan server-side pagination
+const getActivityLogs = (page = 1, limit = 20, search = "", dateFilter = "", startDate = "", endDate = "") => {
+  const params = new URLSearchParams();
+  params.append("page", page);
+  params.append("limit", limit);
+  if (search) params.append("search", search);
+  if (dateFilter && dateFilter !== "all") params.append("date_filter", dateFilter);
+  if (startDate) params.append("start_date", startDate);
+  if (endDate) params.append("end_date", endDate);
+  return api.get(`/admin/logs?${params.toString()}`);
 };
 
 // Log Evaluasi Real-time (Admin Only)

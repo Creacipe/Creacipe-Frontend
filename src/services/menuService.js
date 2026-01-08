@@ -3,8 +3,14 @@
 import api from './api';
 
 // ... (fungsi getPopularMenus, getAllMenus, getMenuById, getRecommendations tetap ada) ...
-const getPopularMenus = () => api.get('/menus/popular');
-const getAllMenus = () => api.get('/menus');
+const getPopularMenus = (page = 1, limit = 20) => api.get(`/menus/popular?page=${page}&limit=${limit}`);
+const getAllMenus = (page = 1, limit = 20, search = '') => {
+  let url = `/menus?page=${page}&limit=${limit}`;
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
+  }
+  return api.get(url);
+};
 const getMenuById = (id) => api.get(`/menus/${id}`);
 const getRecommendations = (id) => api.get(`/menus/${id}/recommendations`);
 
@@ -51,27 +57,51 @@ const getUserInteractionStatus = (id) => {
 };
 
 /**
- * Mendapatkan semua resep yang dibuat oleh user yang sedang login.
+ * Mendapatkan semua resep yang dibuat oleh user yang sedang login dengan pagination.
  * Endpoint: GET /api/me/menus
+ * @param {number} page - Halaman (default 1)
+ * @param {number} limit - Jumlah per halaman (default 12)
+ * @param {string} search - Kata kunci pencarian (optional)
  */
-const getMyMenus = () => {
-  return api.get("/me/menus");
+const getMyMenus = (page = 1, limit = 12, search = "") => {
+  const params = new URLSearchParams({
+    page,
+    limit
+  });
+  if (search) params.append("search", search);
+  return api.get(`/me/menus?${params.toString()}`);
 };
 
 /**
- * Mendapatkan semua resep yang di-bookmark oleh user.
+ * Mendapatkan semua resep yang di-bookmark oleh user dengan pagination.
  * Endpoint: GET /api/me/bookmarks
+ * @param {number} page - Halaman (default 1)
+ * @param {number} limit - Jumlah per halaman (default 12)
+ * @param {string} search - Kata kunci pencarian (optional)
  */
-const getMyBookmarks = () => {
-  return api.get("/me/bookmarks");
+const getMyBookmarks = (page = 1, limit = 12, search = "") => {
+  const params = new URLSearchParams({
+    page,
+    limit
+  });
+  if (search) params.append("search", search);
+  return api.get(`/me/bookmarks?${params.toString()}`);
 };
 
 /**
- * Mendapatkan gabungan resep milik user dan bookmark.
+ * Mendapatkan gabungan resep milik user dan bookmark dengan pagination.
  * Endpoint: GET /api/me/collection
+ * @param {number} page - Halaman (default 1)
+ * @param {number} limit - Jumlah per halaman (default 12)
+ * @param {string} search - Kata kunci pencarian (optional)
  */
-const getMyCollection = () => {
-  return api.get("/me/collection");
+const getMyCollection = (page = 1, limit = 12, search = "") => {
+  const params = new URLSearchParams({
+    page,
+    limit
+  });
+  if (search) params.append("search", search);
+  return api.get(`/me/collection?${params.toString()}`);
 };
 
 // --- GANTI FUNGSI INI ---
@@ -119,16 +149,16 @@ export const menuService = {
   getAllMenus,
   getMenuById,
   getRecommendations,
-  likeMenu,       // Tambahkan
-  dislikeMenu,    // Tambahkan
-  bookmarkMenu,   // Tambahkan
+  likeMenu, // Tambahkan
+  dislikeMenu, // Tambahkan
+  bookmarkMenu, // Tambahkan
   unbookmarkMenu, // Tambahkan
-  createMenu,     // Tambahkan
+  createMenu, // Tambahkan
   getUserInteractionStatus, // Tambahkan
-  getMyMenus,            // Tambahkan
-  getMyBookmarks,        // Tambahkan
-  getMyCollection,      // Tambahkan
-  updateMenu,      // Tambahkan
-  deleteMenu,       // Tambahkan
+  getMyMenus, // Tambahkan
+  getMyBookmarks, // Tambahkan
+  getMyCollection, // Tambahkan
+  updateMenu, // Tambahkan
+  deleteMenu, // Tambahkan
   getPersonalizedRecommendations, // Tambahkan
 };

@@ -27,7 +27,7 @@ const RecommendedRecipesPage = () => {
       try {
         setLoading(true);
         const response = await menuService.getPersonalizedRecommendations();
-        setRecipes(response.data.data);
+        setRecipes(response.data.data || []);
       } catch (err) {
         console.error("Error fetching recommendations:", err);
         setError(err.response?.data?.error || "Gagal mengambil rekomendasi.");
@@ -39,7 +39,7 @@ const RecommendedRecipesPage = () => {
     fetchRecommendations();
   }, [user, navigate]);
 
-  // Pagination logic
+  // Client-side pagination (data from ML is already limited)
   const indexOfLastRecipe = currentPage * recipesPerPage;
   const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
   const currentRecipes = recipes.slice(indexOfFirstRecipe, indexOfLastRecipe);

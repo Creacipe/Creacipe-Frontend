@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { userService } from "../../services/userService";
 import { verificationService } from "../../services/verificationService";
+import { BACKEND_URL } from "../../services/api";
 import { User, Mail, Calendar, Camera, Lock, Save, X } from "lucide-react";
 import Toast from "../../components/ui/Toast/Toast";
 import "./ProfilePage.scss";
@@ -57,7 +58,7 @@ const ProfilePage = () => {
           : "",
         bio: authUser.Profile?.bio || "",
         avatar: authUser.Profile?.profile_picture_url
-          ? `http://localhost:8080${authUser.Profile.profile_picture_url}`
+          ? `${BACKEND_URL}${authUser.Profile.profile_picture_url}`
           : null,
       };
       setUser(userData);
@@ -121,7 +122,7 @@ const ProfilePage = () => {
       // Update local state dengan data dari backend
       const bioValue = updatedUser.Profile?.bio || "";
       const pictureUrl = updatedUser.Profile?.profile_picture_url
-        ? `http://localhost:8080${updatedUser.Profile.profile_picture_url}`
+        ? `${BACKEND_URL}${updatedUser.Profile.profile_picture_url}`
         : null;
 
       const userData = {
@@ -373,7 +374,7 @@ const ProfilePage = () => {
             : "",
           bio: updatedUser.Profile?.bio || "",
           avatar: updatedUser.Profile?.profile_picture_url
-            ? `http://localhost:8080${updatedUser.Profile.profile_picture_url}`
+            ? `${BACKEND_URL}${updatedUser.Profile.profile_picture_url}`
             : null,
         };
 
