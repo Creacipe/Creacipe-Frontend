@@ -14,6 +14,17 @@ const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 export const BACKEND_URL = API_URL.replace(/\/api$/, "");
 
+// Helper function untuk handle image URLs
+// Jika URL sudah absolute (http/https), gunakan langsung
+// Jika relative path, prepend BACKEND_URL
+export const getImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url; // URL sudah absolute (ImageKit, dll)
+  }
+  return `${BACKEND_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const api = axios.create({
   baseURL: API_URL,
   // JANGAN set Content-Type default, biarkan axios yang atur

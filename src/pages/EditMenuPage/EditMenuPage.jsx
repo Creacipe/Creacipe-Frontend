@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { menuService } from "../../services/menuService";
 import { tagService } from "../../services/tagService";
-import { BACKEND_URL } from "../../services/api";
+import { getImageUrl } from "../../services/api";
 import { Image as ImageIcon, Plus, X, UploadCloud, Save } from "lucide-react";
 import "./EditMenuPage.scss";
 
@@ -209,7 +209,7 @@ const EditMenuPage = () => {
       return url;
     }
     // Jika path relatif, tambahkan base URL
-    return `${BACKEND_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+    return getImageUrl(url);
   };
 
   const displayImage = imagePreview || getImageUrl(currentImageUrl);

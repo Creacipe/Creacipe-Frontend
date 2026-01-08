@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { BACKEND_URL } from "../services/api";
+import { getImageUrl } from "../services/api";
 import {
   Menu,
   X,
@@ -263,7 +263,7 @@ const DashboardLayout = () => {
               <div className="user-avatar">
                 {user?.Profile?.profile_picture_url ? (
                   <img
-                    src={`${BACKEND_URL}${user.Profile.profile_picture_url}`}
+                    src={getImageUrl(user.Profile.profile_picture_url)}
                     alt={user?.name}
                     className="avatar-image"
                   />

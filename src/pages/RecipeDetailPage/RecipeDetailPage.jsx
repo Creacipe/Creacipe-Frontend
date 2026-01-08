@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { menuService } from "../../services/menuService";
 import { commentService } from "../../services/commentService";
-import { BACKEND_URL } from "../../services/api";
+import { getImageUrl } from "../../services/api";
 import RecipeCard from "../../components/recipe/RecipeCard/RecipeCard";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -386,7 +386,7 @@ const RecipeDetailPage = () => {
                   <div className="comment-avatar">
                     {comment.user_avatar ? (
                       <img
-                        src={`${BACKEND_URL}${comment.user_avatar}`}
+                        src={getImageUrl(comment.user_avatar)}
                         alt={comment.user_name}
                       />
                     ) : (

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { BACKEND_URL } from "../../../services/api";
+import { getImageUrl } from "../../../services/api";
 import { Bell, User, PlusCircle, BookOpen, LogOut, LayoutDashboard } from "lucide-react";
 import { notificationService } from "../../../services/notificationService";
 import "./Profile.scss";
@@ -79,9 +79,7 @@ const Profile = () => {
   const displayEmail = user.Email || user.email || "";
 
   // Ambil foto profil dari user data
-  const profilePicture = user.Profile?.profile_picture_url
-    ? `${BACKEND_URL}${user.Profile.profile_picture_url}`
-    : null;
+  const profilePicture = getImageUrl(user.Profile?.profile_picture_url);
 
   // Cek apakah user adalah admin atau editor
   const userRole = user.role || user.Role?.role_name;
